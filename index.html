@@ -820,13 +820,3 @@
 </body>
 </html>
 ```
-
-**Resumo das Mudanças:**
-
-1.  **CSS:**
-    * As classes `.verification-ok` e `.verification-fail` agora definem `color` e `font-weight` diretamente, sem `@apply`.
-    * Adicionada a regra `.results-table sub` para diminuir o tamanho da fonte dos subscritos nas tabelas de resultado.
-2.  **JavaScript (`updateUI`):**
-    * A função `addIndStressRow` foi atualizada para usar a lógica sugerida pelo ChatGPT, separando a primeira letra e aplicando `<sub>` ao restante para formatar os nomes das ações na tabela de tensões individuais.
-
-Com estas alterações, os subscritos devem aparecer corretamente e a coluna "Verif." deve exibir as cores verde e vermelho conforme o resulta
