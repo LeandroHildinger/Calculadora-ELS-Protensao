@@ -107,15 +107,15 @@
                           <div class="space-y-4 bg-gray-50 p-4 rounded-lg border input-grid-vertical"> <div>
                                 <p class="text-sm font-medium text-gray-600 mb-2">Laje Pré (1ª Camada):</p>
                                 <div class="grid grid-cols-2 gap-x-4">
-                                    <div><label for="bf1" class="input-label">Largura (b<sub>f1</sub>)</label><input type="number" id="bf1" name="bf1" step="0.01" class="input-field" value="1.00" placeholder="m"></div>
-                                    <div><label for="hf1" class="input-label">Altura (h<sub>f1</sub>)</label><input type="number" id="hf1" name="hf1" step="0.01" class="input-field" value="0.11" placeholder="m"></div>
+                                    <div><label for="bf1" class="input-label">Largura (b<sub>f1</sub>) (m)</label><input type="number" id="bf1" name="bf1" step="0.01" class="input-field" value="1.00" placeholder="m"></div>
+                                    <div><label for="hf1" class="input-label">Altura (h<sub>f1</sub>) (m)</label><input type="number" id="hf1" name="hf1" step="0.01" class="input-field" value="0.11" placeholder="m"></div>
                                 </div>
                               </div>
                               <div>
                                 <p class="text-sm font-medium text-gray-600 mt-2 mb-2">Capa Conc. (2ª Camada):</p>
                                 <div class="grid grid-cols-2 gap-x-4">
-                                    <div><label for="bf2" class="input-label">Largura (b<sub>f2</sub>)</label><input type="number" id="bf2" name="bf2" step="0.001" class="input-field" value="3.455" placeholder="m"></div>
-                                    <div><label for="hf2" class="input-label">Altura (h<sub>f2</sub>)</label><input type="number" id="hf2" name="hf2" step="0.01" class="input-field" value="0.14" placeholder="m"></div>
+                                    <div><label for="bf2" class="input-label">Largura (b<sub>f2</sub>) (m)</label><input type="number" id="bf2" name="bf2" step="0.001" class="input-field" value="3.455" placeholder="m"></div>
+                                    <div><label for="hf2" class="input-label">Altura (h<sub>f2</sub>) (m)</label><input type="number" id="hf2" name="hf2" step="0.01" class="input-field" value="0.14" placeholder="m"></div>
                                 </div>
                               </div>
                           </div>
@@ -124,9 +124,9 @@
                     <div id="tab-content-materiais" class="tab-content hidden">
                           <h3 class="subsection-title">2.1 Concreto</h3>
                           <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 gap-y-4 mb-6 bg-gray-50 p-4 rounded-lg border input-grid-vertical">
-                              <div><label for="fckj_ato" class="input-label">f<sub>ck,j</sub> (ATO)</label><input type="number" id="fckj_ato" name="fckj_ato" step="10" class="input-field" value="3500" placeholder="tf/m²"></div>
-                              <div><label for="fckj_servico" class="input-label">f<sub>ck,j</sub> (Serviço)</label><input type="number" id="fckj_servico" name="fckj_servico" step="10" class="input-field" value="3500" placeholder="tf/m²"></div>
-                              <div><label for="fck28" class="input-label">f<sub>ck</sub> (28d)</label><input type="number" id="fck28" name="fck28" step="10" class="input-field" value="4500" placeholder="tf/m²"></div>
+                              <div><label for="fckj_ato" class="input-label">f<sub>ck,j</sub> (ATO) (tf/m²)</label><input type="number" id="fckj_ato" name="fckj_ato" step="10" class="input-field" value="3500" placeholder="tf/m²"></div>
+                              <div><label for="fckj_servico" class="input-label">f<sub>ck,j</sub> (Serviço) (tf/m²)</label><input type="number" id="fckj_servico" name="fckj_servico" step="10" class="input-field" value="3500" placeholder="tf/m²"></div>
+                              <div><label for="fck28" class="input-label">f<sub>ck</sub> (28d) (tf/m²)</label><input type="number" id="fck28" name="fck28" step="10" class="input-field" value="4500" placeholder="tf/m²"></div>
                               <div><label for="alpha" class="input-label">α (Alfa)</label><input type="number" id="alpha" name="alpha" step="0.1" class="input-field" value="1.2" placeholder="1.0, 1.2 ou 1.5"></div>
                           </div>
                           <h3 class="subsection-title">2.2 Protensão</h3>
@@ -134,21 +134,21 @@
                               <div>
                                   <p class="text-md font-medium text-gray-700 mb-3">Protensão - Etapa 1:</p>
                                   <div class="grid grid-cols-2 gap-x-4 gap-y-4 input-grid-vertical">
-                                      <div><label for="cg_cables1" class="input-label">CG Cabos</label><input type="number" id="cg_cables1" name="cg_cables1" step="0.001" class="input-field prestress-input" value="0.209" placeholder="m"></div>
-                                      <div><label for="num_cables1" class="input-label">Nº Cabos</label><input type="number" id="num_cables1" name="num_cables1" step="1" class="input-field prestress-input" value="46" placeholder="unid."></div>
-                                      <div><label for="po1" class="input-label">P₀</label><input type="number" id="po1" name="po1" step="0.1" class="input-field prestress-input" value="21.1" placeholder="tf/cabo"></div>
-                                      <div><label for="pinf1" class="input-label">P<sub class="text-xs">∞</sub></label><input type="number" id="pinf1" name="pinf1" step="0.1" class="input-field prestress-input" value="17.8" placeholder="tf/cabo"></div>
-                                      <div class="col-span-2"><label for="ato_percentage" class="input-label">% P₀ (ATO)</label><input type="number" id="ato_percentage" name="ato_percentage" step="1" min="0" max="100" class="input-field" value="100" placeholder="%"></div>
+                                      <div><label for="cg_cables1" class="input-label">CG Cabos (m)</label><input type="number" id="cg_cables1" name="cg_cables1" step="0.001" class="input-field prestress-input" value="0.209" placeholder="m"></div>
+                                      <div><label for="num_cables1" class="input-label">Nº Cabos (unid.)</label><input type="number" id="num_cables1" name="num_cables1" step="1" class="input-field prestress-input" value="46" placeholder="unid."></div>
+                                      <div><label for="po1" class="input-label">P₀ (tf/cabo)</label><input type="number" id="po1" name="po1" step="0.1" class="input-field prestress-input" value="21.1" placeholder="tf/cabo"></div>
+                                      <div><label for="pinf1" class="input-label">P<sub class="text-xs">∞</sub> (tf/cabo)</label><input type="number" id="pinf1" name="pinf1" step="0.1" class="input-field prestress-input" value="17.8" placeholder="tf/cabo"></div>
+                                      <div class="col-span-2"><label for="ato_percentage" class="input-label">% P₀ (ATO) (%)</label><input type="number" id="ato_percentage" name="ato_percentage" step="1" min="0" max="100" class="input-field" value="100" placeholder="%"></div>
                                   </div>
                               </div>
                               <hr class="border-gray-200">
                               <div>
                                   <p class="text-md font-medium text-gray-700 mb-3">Protensão - Etapa 2:</p>
                                   <div class="grid grid-cols-2 gap-x-4 gap-y-4 input-grid-vertical">
-                                       <div><label for="cg_cables2" class="input-label">CG Cabos</label><input type="number" id="cg_cables2" name="cg_cables2" step="0.001" class="input-field prestress-input" value="0.0" placeholder="m"></div>
-                                      <div><label for="num_cables2" class="input-label">Nº Cabos</label><input type="number" id="num_cables2" name="num_cables2" step="1" class="input-field prestress-input" value="0" placeholder="unid."></div>
-                                      <div><label for="po2" class="input-label">P₀</label><input type="number" id="po2" name="po2" step="0.1" class="input-field prestress-input" value="0.0" placeholder="tf/cabo"></div>
-                                      <div><label for="pinf2" class="input-label">P<sub class="text-xs">∞</sub></label><input type="number" id="pinf2" name="pinf2" step="0.1" class="input-field prestress-input" value="0.0" placeholder="tf/cabo"></div>
+                                       <div><label for="cg_cables2" class="input-label">CG Cabos (m)</label><input type="number" id="cg_cables2" name="cg_cables2" step="0.001" class="input-field prestress-input" value="0.0" placeholder="m"></div>
+                                      <div><label for="num_cables2" class="input-label">Nº Cabos (unid.)</label><input type="number" id="num_cables2" name="num_cables2" step="1" class="input-field prestress-input" value="0" placeholder="unid."></div>
+                                      <div><label for="po2" class="input-label">P₀ (tf/cabo)</label><input type="number" id="po2" name="po2" step="0.1" class="input-field prestress-input" value="0.0" placeholder="tf/cabo"></div>
+                                      <div><label for="pinf2" class="input-label">P<sub class="text-xs">∞</sub> (tf/cabo)</label><input type="number" id="pinf2" name="pinf2" step="0.1" class="input-field prestress-input" value="0.0" placeholder="tf/cabo"></div>
                                   </div>
                               </div>
                           </div>
@@ -191,6 +191,13 @@
                     <button id="next-btn" type="button" class="nav-button nav-button-primary" onclick="changeStep(1)">Próximo ›</button>
                  </div>
 
+                 <footer class="app-footer">
+                    <p class="text-sm text-gray-500">Desenvolvido por: Leandro Hildinger Cavalcanti</p>
+                    <p class="text-sm mt-2">
+                        <a href="manual.md" target="_blank" class="text-indigo-600 hover:underline">Ver Manual de Uso</a>
+                    </p>
+                 </footer>
+
             </section>
 
             <aside class="lg:col-span-1">
@@ -217,10 +224,6 @@
                  </div>
             </aside>
         </div>
-
-        <footer class="app-footer">
-            <p class="text-sm text-gray-500">Desenvolvido por: Leandro Hildinger Cavalcanti</p>
-        </footer>
 
         <section id="results-section" class="mt-10 pt-6 border-t border-gray-300 hidden">
               <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Resultados</h2>
@@ -460,6 +463,7 @@
             document.getElementById('fckj_ato').value = "3500";
             document.getElementById('fckj_servico').value = "3500";
             document.getElementById('fck28').value = "4500";
+            document.getElementById('alpha').value = "1.2"; // Valor default para alpha
             document.getElementById('cg_cables1').value = "0.209";
             document.getElementById('num_cables1').value = "46";
             document.getElementById('po1').value = "21.1";
@@ -525,6 +529,7 @@
                 mg2: parseFloat(document.getElementById('mg2').value) || 0,
                 mg3: parseFloat(document.getElementById('mg3').value) || 0,
                 mq: parseFloat(document.getElementById('mq').value) || 0,
+                // Leitura dos esforços normais (tf)
                 ng1: parseFloat(document.getElementById('ng1').value) || 0,
                 ng2: parseFloat(document.getElementById('ng2').value) || 0,
                 ng3: parseFloat(document.getElementById('ng3').value) || 0,
@@ -819,4 +824,3 @@
 
 </body>
 </html>
-```
