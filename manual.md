@@ -86,9 +86,19 @@ A seção de resultados é exibida após o cálculo e contém:
 * **Propriedades Geométricas:** Área, posição do CG (Yinf, Ysup), Inércia e Módulos Resistentes (Winf, Wsup1, Wsup2) para a seção inicial (viga) e final (composta).
 * **Tensões Individuais por Ação (tf/m²):** Mostra a contribuição de cada ação (momentos Mg, Mq; esforços normais Ng, Nq; protensão P0, Pinf - axial e flexão) para as tensões nas fibras inferior (σ<sub>inf</sub>), superior da viga (σ<sub>sup1</sub>) e superior da capa (σ<sub>sup2</sub>).
 * **Tensões Limites (tf/m²):** Apresenta os valores limites de tensão (compressão e tração) para cada fibra relevante em cada uma das 6 verificações (0 a 5), calculados com base no fck e α informados e nas fórmulas da NBR 6118.
+    * **Verif. 0 (ATO %P₀):** σ<sub>inf</sub> ≥ -0.7⋅f<sub>ck,j(ATO)</sub> | σ<sub>sup1</sub> ≤ α⋅f<sub>ctm,j(ATO)</sub>
+    * **Verif. 1 (ATO 100%):** σ<sub>inf</sub> ≥ -0.7⋅f<sub>ck,j(ATO)</sub> | σ<sub>sup1</sub> ≤ α⋅f<sub>ctm,j(ATO)</sub>
+    * **Verif. 2 (Interm. G1+G2+P1o):** σ<sub>inf</sub> ≤ f<sub>ctm,j(Serv)</sub> | σ<sub>sup1</sub> ≥ -0.7⋅f<sub>ck</sub>
+    * **Verif. 3 (Interm. G1+G2+P1o+P2o):** σ<sub>inf</sub> ≥ -0.7⋅f<sub>ck</sub> | σ<sub>sup2</sub> ≤ f<sub>ctm,j(Serv)</sub>
+    * **Verif. 4 (ELS-F):** σ<sub>inf</sub> ≤ f<sub>ctm,j(Serv)</sub> | σ<sub>sup2</sub> ≥ -0.6⋅f<sub>ck</sub>
+    * **Verif. 5 (ELS-D):** σ<sub>inf</sub> ≤ 0 | σ<sub>sup2</sub> ≥ -0.45⋅f<sub>ck</sub>
 * **Tensões Calculadas (tf/m²):** Mostra as tensões finais combinadas para cada uma das 6 verificações (0 a 5), somando as tensões individuais relevantes.
-    * **Comb.:** Número da combinação (0 a 5).
-    * **σ<sub>inf</sub>, σ<sub>sup1</sub>, σ<sub>sup2</sub>:** Tensão calculada na respectiva fibra.
+    * **Comb. 0:** σ<sub>Mg1</sub> + σ<sub>Ng1</sub> + (%P₀/100)⋅1.1⋅(σ<sub>P1o(ax)</sub>+σ<sub>P1o(flex)</sub>)
+    * **Comb. 1:** σ<sub>Mg1</sub> + σ<sub>Ng1</sub> + 1.1⋅(σ<sub>P1o(ax)</sub>+σ<sub>P1o(flex)</sub>)
+    * **Comb. 2:** σ<sub>Mg1</sub>+σ<sub>Mg2</sub>+σ<sub>Ng1</sub>+σ<sub>Ng2</sub>+σ<sub>P1o(ax)</sub>+σ<sub>P1o(flex)</sub>
+    * **Comb. 3:** σ<sub>Mg1</sub>+σ<sub>Mg2</sub>+σ<sub>Ng1</sub>+σ<sub>Ng2</sub>+σ<sub>P1o(ax)</sub>+σ<sub>P1o(flex)</sub>+σ<sub>P2o(ax)</sub>+σ<sub>P2o(flex)</sub>
+    * **Comb. 4:** Σσ<sub>G</sub>+Σσ<sub>N,G</sub>+σ<sub>P</sub>+ψ<sub>1</sub>⋅(σ<sub>Mq</sub>+σ<sub>Nq</sub>)  *(σ<sub>P</sub> usa P<sub>0</sub> para σ<sub>sup1</sub> e P<sub>∞</sub> para σ<sub>inf</sub>, σ<sub>sup2</sub>)*
+    * **Comb. 5:** Σσ<sub>G</sub>+Σσ<sub>N,G</sub>+σ<sub>P</sub>+ψ<sub>2</sub>⋅(σ<sub>Mq</sub>+σ<sub>Nq</sub>)  *(σ<sub>P</sub> usa P<sub>0</sub> para σ<sub>sup1</sub> e P<sub>∞</sub> para σ<sub>inf</sub>, σ<sub>sup2</sub>)*
     * **Verif.:** Indica se a seção passa ("OK" em verde) ou falha ("FALHA" em vermelho) na verificação, comparando as tensões calculadas com os limites.
 
 **Visualização da Seção:**
@@ -99,4 +109,5 @@ A seção de resultados é exibida após o cálculo e contém:
 
 * Lembre-se de inserir os elementos da viga de baixo para cima na tabela de geometria.
 * Verifique as convenções de sinal e as unidades ao inserir os dados.
-* Os critérios de combinação e limites seguem as premissas da NBR 6118 e da planilha de referência.
+* Os critérios de combinação e limites seguem as premissas da NBR 6118.
+
