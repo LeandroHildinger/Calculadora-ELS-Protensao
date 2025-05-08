@@ -1,4 +1,4 @@
-# Manual de Uso: Calculadora de Tensões em Serviço (ELS) para Elementos Protendidos (Versão Aprimorada)
+# Manual de Uso: Calculadora de Tensões em Serviço (ELS) para Elementos Protendidos
 
 **Objetivo:**
 
