@@ -80,45 +80,60 @@
 
                 <div id="tab-content-container">
                     <div id="tab-content-geometria" class="tab-content">
-                          <h3 class="subsection-title">1.1 Viga Pré-Moldada</h3>
-                          <div class="overflow-x-auto mb-4">
-                              <table id="geometry-table" class="min-w-full border border-gray-300 table-fixed w-full">
-                                  <thead class="table-sticky-header">
-                                      <tr>
-                                          <th class="table-header w-16">Elem.</th>
-                                          <th class="table-header">B inf. (m)</th>
-                                          <th class="table-header">B sup. (m)</th>
-                                          <th class="table-header">h (m)</th>
-                                          <th class="table-header">Área (m²)</th>
-                                      </tr>
-                                  </thead>
-                                  <tbody id="geometry-tbody"></tbody>
-                              </table>
-                          </div>
-                          <div class="flex justify-start space-x-2 mb-4">
-                              <button id="add-row-btn" title="Adicionar Elemento" class="add-remove-button">
-                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-                              </button>
-                              <button id="remove-row-btn" title="Remover Último Elemento" class="add-remove-button">
-                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" /></svg>
-                              </button>
-                          </div>
-                          <h3 class="subsection-title mt-6">1.2 Laje/Capa (Composta)</h3>
-                          <div class="space-y-4 bg-gray-50 p-4 rounded-lg border input-grid-vertical"> <div>
-                              <p class="text-sm font-medium text-gray-600 mb-2">Laje Pré (1ª Camada):</p>
-                              <div class="grid grid-cols-2 gap-x-4">
-                                  <div><label for="bf1" class="input-label">Largura (b<sub>f1</sub>) (m)</label><input type="number" id="bf1" name="bf1" step="0.01" class="input-field" value="1.00" placeholder="m"></div>
-                                  <div><label for="hf1" class="input-label">Altura (h<sub>f1</sub>) (m)</label><input type="number" id="hf1" name="hf1" step="0.01" class="input-field" value="0.11" placeholder="m"></div>
-                              </div>
+                        <h3 class="subsection-title">1.1 Viga Pré-Moldada</h3>
+                        <div class="overflow-x-auto mb-4">
+                            <table id="geometry-table" class="min-w-full border border-gray-300 table-fixed w-full">
+                                <thead class="table-sticky-header">
+                                    <tr>
+                                        <th class="table-header w-16">Elem.</th>
+                                        <th class="table-header">B inf. (m)</th>
+                                        <th class="table-header">B sup. (m)</th>
+                                        <th class="table-header">h (m)</th>
+                                        <th class="table-header">Área (m²)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="geometry-tbody"></tbody>
+                            </table>
+                        </div>
+                        <div class="flex justify-start space-x-2 mb-4">
+                            <button id="add-row-btn" title="Adicionar Elemento" class="add-remove-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <button id="remove-row-btn" title="Remover Último Elemento" class="add-remove-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </div>
+                        <h3 class="subsection-title mt-6">1.2 Laje/Capa (Composta)</h3>
+                        <!-- Removida a classe input-grid-vertical e ajustado o layout dos itens internos -->
+                        <div class="space-y-4 bg-gray-50 p-4 rounded-lg border">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 mb-2">Laje Pré (1ª Camada):</p>
+                                <!-- Aplicado grid com 2 colunas apenas para os inputs, e flex para label/input -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
+                                        <label for="bf1" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">Largura (b<sub>f1</sub>) (m)</label>
+                                        <input type="number" id="bf1" name="bf1" step="0.01" class="input-field sm:!w-auto sm:flex-grow" value="1.00" placeholder="m">
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
+                                        <label for="hf1" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">Altura (h<sub>f1</sub>) (m)</label>
+                                        <input type="number" id="hf1" name="hf1" step="0.01" class="input-field sm:!w-auto sm:flex-grow" value="0.11" placeholder="m">
+                                    </div>
+                                </div>
                             </div>
                             <div>
-                              <p class="text-sm font-medium text-gray-600 mt-2 mb-2">Capa Conc. (2ª Camada):</p>
-                              <div class="grid grid-cols-2 gap-x-4">
-                                  <div><label for="bf2" class="input-label">Largura (b<sub>f2</sub>) (m)</label><input type="number" id="bf2" name="bf2" step="0.001" class="input-field" value="3.455" placeholder="m"></div>
-                                  <div><label for="hf2" class="input-label">Altura (h<sub>f2</sub>) (m)</label><input type="number" id="hf2" name="hf2" step="0.01" class="input-field" value="0.14" placeholder="m"></div>
-                              </div>
+                                <p class="text-sm font-medium text-gray-600 mt-2 mb-2">Capa Conc. (2ª Camada):</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
+                                        <label for="bf2" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">Largura (b<sub>f2</sub>) (m)</label>
+                                        <input type="number" id="bf2" name="bf2" step="0.001" class="input-field sm:!w-auto sm:flex-grow" value="3.455" placeholder="m">
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
+                                        <label for="hf2" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">Altura (h<sub>f2</sub>) (m)</label>
+                                        <input type="number" id="hf2" name="hf2" step="0.01" class="input-field sm:!w-auto sm:flex-grow" value="0.14" placeholder="m">
+                                    </div>
+                                </div>
                             </div>
-                          </div>
+                        </div>
                     </div>
 
                     <div id="tab-content-materiais" class="tab-content hidden">
