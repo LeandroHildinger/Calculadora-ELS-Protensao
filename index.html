@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora ELS - Elemento Protendido (Refatorada)</title>
+    <title>Calculadora ELS - Elemento Protendido (Superposição de Diagramas)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Estilos gerais e de input */
@@ -11,33 +11,21 @@
         input[type=number] { -moz-appearance: textfield; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         
-        .input-label { /* Estilo para labels que ficam ACIMA do input */
-            @apply block text-sm font-medium text-gray-700 mb-1; 
-        }
-        .input-label-horizontal { /* Para labels AO LADO do input */
-            @apply text-sm font-medium text-gray-700 whitespace-nowrap; 
-        }
-
-        .input-field { 
-            @apply block w-full min-w-[5rem] px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-gray-400; 
-        }
-        .input-field-calculated { 
-            @apply block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm sm:text-sm text-gray-600; 
-        }
+        .input-label { @apply block text-sm font-medium text-gray-700 mb-1; }
+        .input-label-horizontal { @apply text-sm font-medium text-gray-700 whitespace-nowrap; }
+        .input-field { @apply block w-full min-w-[5rem] px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-gray-400; }
+        .input-field-calculated { @apply block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm sm:text-sm text-gray-600; }
         
-        /* Estilos de tabela */
         .table-sticky-header th { @apply sticky top-0 z-10; }
         .table-header { @apply px-4 py-2 bg-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300; }
         .table-cell { @apply px-4 py-2 whitespace-nowrap text-sm text-gray-800 border-b border-gray-200; }
         .table-cell-input { @apply w-full min-w-[4rem] px-1 py-0.5 bg-gray-50 border border-transparent focus:bg-white focus:border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 text-right; }
         .table-cell-output { @apply w-full px-1 py-0.5 bg-white text-right; }
         
-        /* Estilos de verificação */
         .verification-ok { color: #16a34a; font-weight: 600; }
         .verification-fail { color: #dc2626; font-weight: 600; }
         .results-table td, .results-table th { @apply border border-gray-200; }
         
-        /* Estilos de seção e visualização */
         .section-title { @apply text-lg font-semibold text-gray-800 mb-4 border-b border-gray-300 pb-2; }
         .subsection-title { @apply text-md font-medium text-gray-700 mb-3; }
         #section-visualization-container { @apply w-full aspect-square bg-gray-100 border border-gray-300 rounded-md mb-6 overflow-hidden relative; }
@@ -47,32 +35,47 @@
         .dimension-line { stroke: #9ca3af; stroke-width: 1; stroke-dasharray: 2,2; }
         .dimension-text { font-size: 10px; fill: #6b7280; text-anchor: middle; }
         
-        /* Estilos para Abas */
         .tab-button { @apply px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition duration-150 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500; }
         .tab-button-active { @apply border-indigo-500 text-indigo-600 bg-white; }
         .tab-button-inactive { @apply border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300; }
         .tab-content { @apply p-6 bg-white border border-t-0 border-gray-200 rounded-b-lg; }
         
-        /* Estilos Botões Navegação */
         .nav-buttons { @apply flex justify-between mt-6; }
         .nav-button { @apply px-6 py-2 rounded-md text-sm font-medium shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed; }
         .nav-button-primary { @apply bg-indigo-600 text-white hover:bg-indigo-700; }
         .nav-button-secondary { @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50; }
         
-        /* Card Style */
         .card { @apply bg-white p-4 rounded-xl shadow border border-gray-300; }
-        
-        /* Observações */
         .observations { @apply bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-lg text-sm space-y-2 leading-5; }
-        
-        /* Botões +/- */
         .add-remove-button { @apply w-9 h-9 flex items-center justify-center bg-white text-gray-600 border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1; }
-        
-        /* Estilo para subscrito menor */
         .results-table sub, .input-label sub, .input-label-horizontal sub, #tab-content-acoes sub { font-size: 0.75em; vertical-align: sub; }
-        
-        /* Footer para Créditos */
         .app-footer { @apply mt-8 pt-4 border-t border-gray-200 text-left; }
+        
+        #stress-superposition-diagrams-container {
+            display: flex; /* Changed for horizontal layout */
+            flex-direction: row; /* Explicitly row */
+            align-items: center; /* Vertically align diagrams and operators */
+            gap: 8px; /* Spacing between items, from user example */
+            overflow-x: auto;
+            padding: 1rem; 
+            background-color: #f9fafb; 
+            border-radius: 0.25rem; 
+            border: 1px solid #e5e7eb; 
+            min-height: 200px; /* Adjust if needed based on diagram height */
+        }
+        #stress-superposition-diagrams-container svg {
+            /* vertical-align: middle; No longer needed with flex */
+            flex-shrink: 0; /* Prevent SVGs from shrinking */
+        }
+        #stress-superposition-diagrams-container span.operator {
+            /* display: inline-block; No longer needed with flex */
+            /* vertical-align: middle; No longer needed with flex */
+            /* line-height: 160px; No longer needed with align-items: center */
+            font-size: 24px; 
+            font-weight: bold;
+            margin: 0 8px; 
+            flex-shrink: 0; /* Prevent operators from shrinking */
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,7 +90,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             <section id="input-section" class="lg:col-span-2">
-                <div class="border-b border-gray-200">
+                 <div class="border-b border-gray-200">
                     <nav class="-mb-px flex space-x-6" aria-label="Tabs">
                         <button id="tab-btn-geometria" type="button" class="tab-button tab-button-active" onclick="changeTab('geometria')">1. Geometria</button>
                         <button id="tab-btn-materiais" type="button" class="tab-button tab-button-inactive" onclick="changeTab('materiais')">2. Materiais e Protensão</button>
@@ -217,13 +220,14 @@
                     </div>
                 </div>
 
+
                 <div class="nav-buttons">
                     <button id="prev-btn" type="button" class="nav-button nav-button-secondary" onclick="changeStep(-1)" disabled>‹ Voltar</button>
                     <button id="next-btn" type="button" class="nav-button nav-button-primary" onclick="changeStep(1)">Próximo ›</button>
                 </div>
                 <footer class="app-footer">
                     <p class="text-sm text-gray-500">Desenvolvido por: Leandro Hildinger Cavalcanti</p>
-                    <p class="text-sm mt-2">
+                     <p class="text-sm mt-2">
                         <a href="manual.md" target="_blank" class="text-indigo-600 hover:underline">Ver Manual de Uso</a>
                     </p>
                 </footer>
@@ -344,7 +348,7 @@
                     </div>
                 </div>
 
-                <div class="card lg:col-span-2">
+                 <div class="card lg:col-span-2">
                     <h3 class="text-lg font-semibold text-gray-700 mb-3">Momentos de Descompressão (tf.m)</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full results-table">
@@ -368,38 +372,79 @@
                     </div>
                 </div>
             </div>
+
+            <div class="card lg:col-span-2 mt-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Superposição de Tensões (Diagramas)</h3>
+                <div class="mb-4">
+                    <label for="stress-superposition-combo-select" class="input-label">Selecionar Combinação para Visualizar:</label>
+                    <select id="stress-superposition-combo-select" class="input-field">
+                        <option value="0">0 (ATO: η ⋅ 1.1 ⋅ P1o + G1)</option>
+                        <option value="1">1 (ATO: 1.1 ⋅ (P1o + P2o) + G1)</option>
+                        <option value="2">2 (Interm.: P1o + G1 + G2)</option>
+                        <option value="3">3 (Interm.: G1+G2 + P1o+P2o)</option>
+                        <option value="4" selected>4 (ELS-F: P1o+ΔP1 + P2o+ΔP2 + G1+G2+G3 + ψ1⋅Q)</option>
+                        <option value="5">5 (ELS-D: P1o+ΔP1 + P2o+ΔP2 + G1+G2+G3 + ψ2⋅Q)</option>
+                    </select>
+                </div>
+                <div id="stress-superposition-diagrams-container" class="overflow-x-auto whitespace-nowrap p-4 bg-gray-50 rounded border border-gray-200 min-h-[200px]">
+                    <p class="text-sm text-gray-500 italic">Selecione uma combinação e clique em "Calcular Tensões" para gerar os diagramas de superposição.</p>
+                </div>
+            </div>
+
         </section>
     </div>
 
 <script>
     // --- Constantes ---
-    const TF_PER_KN = 9.80665;
-    const KN_M2_TO_TF_M2 = 1 / TF_PER_KN;
-    const TF_TO_KN = TF_PER_KN;
+    const TF_PER_KN = 9.80665; // 1 tf = 9.80665 kN
+    const KN_M2_TO_TF_M2 = 1 / TF_PER_KN; // Para converter kN/m² para tf/m²
+    const TF_TO_KN = TF_PER_KN; // Para converter tf para kN
+    const SVG_NS = "http://www.w3.org/2000/svg";
 
     // --- Variáveis Globais ---
     let currentStep = 1;
     const totalSteps = 3;
 
+    // Para armazenar dados para os diagramas de superposição
+    window.currentInputs = null;
+    window.currentProperties = null;
+    window.currentIndStresses = null;
+
+
     // --- Elementos da Interface (cache) ---
     let geometryTbody, addRowBtn, removeRowBtn, calculateBtn, resultsSection, visualizationDiv;
     let tabButtons, stepContents, prevBtn, nextBtn;
-    let indStresses = {}; // Tornar indStresses global para ser acessível por sumFiberStress na versão R02
+    let superpositionComboSelect;
+
 
     // --- Funções Auxiliares ---
     const getElement = (id) => document.getElementById(id);
     const querySelectorAll = (selector) => document.querySelectorAll(selector);
     const parseFloatInput = (id, defaultValue = 0) => parseFloat(getElement(id).value) || defaultValue;
     const parseIntInput = (id, defaultValue = 0) => parseInt(getElement(id).value) || defaultValue;
-    const formatNumber = (value, decimals = 0, useDashForNull = true) => {
+    const formatNumber = (value, decimals = 0, useDashForNull = true, keepZero = false) => {
         if (value === null || value === undefined || isNaN(value)) {
             return useDashForNull ? '-' : '';
         }
+        if (!keepZero && Math.abs(value) < 1e-9) return '0'; // Evita -0.0
         return value.toFixed(decimals);
     };
     const updateElementText = (id, value) => { getElement(id).textContent = value; };
     const updateElementValue = (id, value) => { getElement(id).value = value; };
-    const safeGet = (obj, prop) => (obj && obj[prop] !== null && obj[prop] !== undefined) ? obj[prop] : 0;
+    
+    const getPropertyByPath = (obj, path) => {
+        if (!path || typeof path !== 'string') return 0;
+        return path.split('.').reduce((o, k) => (o && typeof o === 'object' && k in o) ? o[k] : 0, obj);
+    };
+    
+    const safeGet = (obj, prop, subProp = null) => {
+        if (subProp) {
+            return (obj && obj[prop] && obj[prop][subProp] !== null && obj[prop][subProp] !== undefined) ? obj[prop][subProp] : 0;
+        }
+        return (obj && obj[prop] !== null && obj[prop] !== undefined) ? obj[prop] : 0;
+    };
+
+
     const flexStress = (moment, modulus) => (modulus > 1e-9 ? moment / modulus : 0);
     const axialStress = (force, area) => (area > 1e-9 ? force / area : 0);
 
@@ -428,7 +473,8 @@
 
     function changeTab(targetTabId) {
         let targetStep = 1;
-        if (targetTabId === 'materiais') targetStep = 2;
+        if (targetTabId === 'geometria') targetStep = 1;
+        else if (targetTabId === 'materiais') targetStep = 2;
         else if (targetTabId === 'acoes') targetStep = 3;
         goToStep(targetStep);
     }
@@ -447,21 +493,21 @@
         row.querySelectorAll('.geometry-input').forEach(input => {
             input.addEventListener('input', handleGeometryInputChange);
         });
-        calculateRowArea({ target: row.querySelector('.geometry-input') });
+        calculateRowArea({ target: row.querySelector('.geometry-input') }); 
     }
 
     function removeGeometryRow() {
         if (geometryTbody.rows.length > 1) {
             geometryTbody.deleteRow(-1);
-            updatePrestressForcesAndMomentsInActionsUI();
-            drawSection();
+            updatePrestressForcesAndMomentsInActionsUI(); 
+            drawSection(); 
         }
     }
 
     function handleGeometryInputChange(event) {
         calculateRowArea(event);
-        updatePrestressForcesAndMomentsInActionsUI();
-        drawSection();
+        updatePrestressForcesAndMomentsInActionsUI(); 
+        drawSection(); 
     }
 
     function calculateRowArea(event) {
@@ -487,19 +533,19 @@
             geometry: [],
             bf1: parseFloatInput('bf1'), hf1: parseFloatInput('hf1'),
             bf2: parseFloatInput('bf2'), hf2: parseFloatInput('hf2'),
-            fckj_ato_tfm2: parseFloatInput('fckj_ato'),
-            fckj_servico_tfm2: parseFloatInput('fckj_servico'),
-            fck28_tfm2: parseFloatInput('fck28'),
+            fckj_ato_tfm2: parseFloatInput('fckj_ato'), 
+            fckj_servico_tfm2: parseFloatInput('fckj_servico'), 
+            fck28_tfm2: parseFloatInput('fck28'), 
             alpha: parseFloatInput('alpha', 1.2),
             cg_cables1: parseFloatInput('cg_cables1'), num_cables1: parseIntInput('num_cables1'),
-            po1_per_cable: parseFloatInput('po1'), pinf1_per_cable: parseFloatInput('pinf1'),
+            po1_per_cable: parseFloatInput('po1'), pinf1_per_cable: parseFloatInput('pinf1'), 
             ato_percentage: parseFloatInput('ato_percentage', 100),
             cg_cables2: parseFloatInput('cg_cables2'), num_cables2: parseIntInput('num_cables2'),
-            po2_per_cable: parseFloatInput('po2'), pinf2_per_cable: parseFloatInput('pinf2'),
-            mg1: parseFloatInput('mg1'), mg2: parseFloatInput('mg2'),
-            mg3: parseFloatInput('mg3'), mq: parseFloatInput('mq'),
-            ng1: parseFloatInput('ng1'), ng2: parseFloatInput('ng2'),
-            ng3: parseFloatInput('ng3'), nq: parseFloatInput('nq'),
+            po2_per_cable: parseFloatInput('po2'), pinf2_per_cable: parseFloatInput('pinf2'), 
+            mg1: parseFloatInput('mg1'), mg2: parseFloatInput('mg2'), 
+            mg3: parseFloatInput('mg3'), mq: parseFloatInput('mq'), 
+            ng1: parseFloatInput('ng1'), ng2: parseFloatInput('ng2'), 
+            ng3: parseFloatInput('ng3'), nq: parseFloatInput('nq'), 
             psi1: parseFloatInput('psi1'), psi2: parseFloatInput('psi2')
         };
 
@@ -517,7 +563,7 @@
         inputs.Pinf1_total_tf = inputs.pinf1_per_cable * inputs.num_cables1;
         inputs.Pinf2_total_tf = inputs.pinf2_per_cable * inputs.num_cables2;
 
-        inputs.fckj_ato_mpa = inputs.fckj_ato_tfm2 * TF_TO_KN / 1000;
+        inputs.fckj_ato_mpa = inputs.fckj_ato_tfm2 * TF_TO_KN / 1000; 
         inputs.fckj_servico_mpa = inputs.fckj_servico_tfm2 * TF_TO_KN / 1000;
         inputs.fck28_mpa = inputs.fck28_tfm2 * TF_TO_KN / 1000;
 
@@ -545,15 +591,16 @@
         let h_total_inicial = 0, current_y_base = 0;
 
         geometry.forEach(el => {
-            if (el.h > 0 && el.area > 0) {
-                const el_cg_y = current_y_base + el.h / 2;
+            if (el.h > 0 && el.area > 0) { 
+                const el_cg_y = current_y_base + el.h / 2; 
                 area_inicial += el.area;
                 static_moment_y_inicial += el.area * el_cg_y;
                 let el_inertia_cg;
-                if (Math.abs(el.binf - el.bsup) < 1e-9) { // Retangular
+                if (Math.abs(el.binf - el.bsup) < 1e-9) { 
                     el_inertia_cg = el.binf * Math.pow(el.h, 3) / 12;
-                } else { // Trapezoidal
-                    el_inertia_cg = (Math.pow(el.h, 3) / 36.0) * (el.binf * el.binf + 4 * el.binf * el.bsup + el.bsup * el.bsup) / (el.binf + el.bsup);
+                } else { 
+                     el_inertia_cg = (Math.pow(el.h, 3) / 36.0) * (el.binf * el.binf + 4 * el.binf * el.bsup + el.bsup * el.bsup) / (el.binf + el.bsup);
+                     if (el.binf + el.bsup === 0) el_inertia_cg = 0; 
                 }
                 inertia_elements_cg_inicial += el_inertia_cg;
                 h_total_inicial += el.h;
@@ -565,7 +612,7 @@
         const y_sup_inicial = h_total_inicial - y_inf_inicial;
 
         let inertia_parallel_axis_inicial = 0;
-        current_y_base = 0;
+        current_y_base = 0; 
         geometry.forEach(el => {
             if (el.h > 0 && el.area > 0) {
                 const el_cg_y = current_y_base + el.h / 2;
@@ -576,37 +623,43 @@
         });
         const inertia_total_inicial = inertia_elements_cg_inicial + inertia_parallel_axis_inicial;
         const w_inf_inicial = y_inf_inicial > 1e-9 ? inertia_total_inicial / y_inf_inicial : 0;
-        const w_sup1_inicial = y_sup_inicial > 1e-9 ? inertia_total_inicial / y_sup_inicial : 0;
+        const w_sup1_inicial = y_sup_inicial > 1e-9 ? inertia_total_inicial / y_sup_inicial : 0; 
+
 
         const area_laje1 = bf1 * hf1;
         const area_laje2 = bf2 * hf2;
         const area_final = area_inicial + area_laje1 + area_laje2;
 
-        const y_cg_laje1 = h_total_inicial + hf1 / 2;
-        const y_cg_laje2 = h_total_inicial + hf1 + hf2 / 2;
+        const y_cg_laje1 = h_total_inicial + hf1 / 2; 
+        const y_cg_laje2 = h_total_inicial + hf1 + hf2 / 2; 
 
         const static_moment_y_final = static_moment_y_inicial +
                                     (area_laje1 * y_cg_laje1) +
                                     (area_laje2 * y_cg_laje2);
         const y_inf_final = area_final > 1e-9 ? static_moment_y_final / area_final : 0;
         const h_total_final = h_total_inicial + hf1 + hf2;
-        const y_sup_final = h_total_final - y_inf_final;
+        const y_sup_final = h_total_final - y_inf_final; 
 
         const inertia_laje1_cg = bf1 * Math.pow(hf1, 3) / 12;
         const inertia_laje2_cg = bf2 * Math.pow(hf2, 3) / 12;
 
         const dist_cg_viga_final_sq = Math.pow(y_inf_inicial - y_inf_final, 2);
-        const dist_cg_laje1_final_sq = area_laje1 > 1e-9 ? Math.pow(y_cg_laje1 - y_inf_final, 2) : 0;
-        const dist_cg_laje2_final_sq = area_laje2 > 1e-9 ? Math.pow(y_cg_laje2 - y_inf_final, 2) : 0;
+        const inertia_viga_no_cg_final = inertia_total_inicial + area_inicial * dist_cg_viga_final_sq;
 
-        const inertia_total_final = (inertia_total_inicial + area_inicial * dist_cg_viga_final_sq) +
-                                  (inertia_laje1_cg + area_laje1 * dist_cg_laje1_final_sq) +
-                                  (inertia_laje2_cg + area_laje2 * dist_cg_laje2_final_sq);
+        const dist_cg_laje1_final_sq = area_laje1 > 1e-9 ? Math.pow(y_cg_laje1 - y_inf_final, 2) : 0;
+        const inertia_laje1_no_cg_final = inertia_laje1_cg + area_laje1 * dist_cg_laje1_final_sq;
+        
+        const dist_cg_laje2_final_sq = area_laje2 > 1e-9 ? Math.pow(y_cg_laje2 - y_inf_final, 2) : 0;
+        const inertia_laje2_no_cg_final = inertia_laje2_cg + area_laje2 * dist_cg_laje2_final_sq;
+
+        const inertia_total_final = inertia_viga_no_cg_final + inertia_laje1_no_cg_final + inertia_laje2_no_cg_final;
+
 
         const w_inf_final = y_inf_final > 1e-9 ? inertia_total_final / y_inf_final : 0;
         const y_sup1_final_dist = Math.abs(h_total_inicial - y_inf_final); 
         const w_sup1_final = y_sup1_final_dist > 1e-9 ? inertia_total_final / y_sup1_final_dist : 0;
-        const w_sup2_final = y_sup_final > 1e-9 ? inertia_total_final / y_sup_final : 0; 
+        const w_sup2_final = y_sup_final > 1e-9 ? inertia_total_final / y_sup_final : 0;
+
 
         return {
             inicial: { area: area_inicial, y_inf: y_inf_inicial, y_sup: y_sup_inicial, inertia: inertia_total_inicial, w_inf: w_inf_inicial, w_sup1: w_sup1_inicial, w_sup2: 0, h_total: h_total_inicial },
@@ -623,10 +676,12 @@
 
     function calculatePrestressMoments(inputs, properties) {
         const { inicial: prop_i, final: prop_f } = properties;
-        const e0_1_inicial = prop_i.y_inf - inputs.cg_cables1;
-        const e0_1_final = prop_f.y_inf - inputs.cg_cables1; 
-        const e0_2_inicial = prop_i.y_inf - inputs.cg_cables2;
-        const e0_2_final = prop_f.y_inf - inputs.cg_cables2; 
+        const e0_1_inicial = prop_i.y_inf - inputs.cg_cables1; 
+        const e0_1_final = prop_f.y_inf - inputs.cg_cables1;   
+        
+        const e0_2_inicial = (inputs.num_cables2 > 0 && inputs.cg_cables2 > 1e-9) ? (prop_i.y_inf - inputs.cg_cables2) : 0;
+        const e0_2_final = (inputs.num_cables2 > 0 && inputs.cg_cables2 > 1e-9) ? (prop_f.y_inf - inputs.cg_cables2) : 0;
+        
         return {
             Mp1o: inputs.Poo1_total_tf * e0_1_inicial,
             Mp2o: inputs.Poo2_total_tf * e0_2_inicial, 
@@ -637,210 +692,233 @@
     
     function calculateLimitStresses(inputs) {
         const { fckj_ato_mpa, fckj_servico_mpa, fck28_mpa, alpha } = inputs;
-        const mpa_to_tfm2_factor = 1000 * KN_M2_TO_TF_M2;
+        const mpa_to_tfm2_factor = 1000 * KN_M2_TO_TF_M2; 
 
-        const fctm_ato_mpa = 0.3 * Math.pow(fckj_ato_mpa, 2/3);
-        const fctm_servico_mpa = 0.3 * Math.pow(fckj_servico_mpa, 2/3); 
+        const fctm_ato_mpa     = 0.3 * Math.pow(fckj_ato_mpa,     2/3);
+        const fctm_servico_mpa = 0.3 * Math.pow(fckj_servico_mpa, 2/3);
 
-        const fctm_ato_tfm2 = fctm_ato_mpa * mpa_to_tfm2_factor;
+        const fctm_ato_tfm2     = fctm_ato_mpa     * mpa_to_tfm2_factor;
         const fctm_servico_tfm2 = fctm_servico_mpa * mpa_to_tfm2_factor;
 
-        const fckj_ato_tfm2_val = fckj_ato_mpa * mpa_to_tfm2_factor;
-        const fck28_tfm2_val = fck28_mpa * mpa_to_tfm2_factor; 
+        const fckj_ato_tfm2_val     = fckj_ato_mpa     * mpa_to_tfm2_factor;
+        const fckj_servico_tfm2_val = fckj_servico_mpa * mpa_to_tfm2_factor; 
+        const fck28_tfm2_val        = fck28_mpa        * mpa_to_tfm2_factor; 
 
         const limits = [
             { inf: -0.70 * fckj_ato_tfm2_val, sup1: alpha * fctm_ato_tfm2, sup2: null }, 
             { inf: -0.70 * fckj_ato_tfm2_val, sup1: alpha * fctm_ato_tfm2, sup2: null }, 
-            { inf: fctm_servico_tfm2, sup1: -0.70 * fck28_tfm2_val, sup2: null },  
-            { inf: -0.70 * fck28_tfm2_val, sup1: null, sup2: fctm_servico_tfm2 },         
-            { inf: null, sup1: null, sup2: -0.60 * fck28_tfm2_val },                     
-            { inf: 0, sup1: null, sup2: -0.45 * fck28_tfm2_val }                        
+            { inf: fctm_servico_tfm2, sup1: -0.70 * fckj_servico_tfm2_val, sup2: null }, 
+            { inf: -0.70 * fck28_tfm2_val, sup1: null, sup2: fctm_servico_tfm2 }, 
+            { inf: fctm_servico_tfm2, sup1: null, sup2: -0.60 * fck28_tfm2_val }, 
+            { inf: 0, sup1: null, sup2: -0.45 * fck28_tfm2_val } 
         ];
-        limits[4].inf = limits[3].sup2; 
         return limits;
     }
 
     function calculateIndividualStresses(inputs, properties) {
         const { inicial: prop_i, final: prop_f } = properties;
-        indStresses = {}; // Limpa/reinicia o objeto global indStresses
+        const indStressesLocal = {}; 
 
-        indStresses.p1o_ax = {
+        // P1o (Etapa 1) - Atua na seção inicial (prop_i)
+        indStressesLocal.p1o_ax = {
             inf: axialStress(-inputs.Poo1_total_kn, prop_i.area),
             sup1: axialStress(-inputs.Poo1_total_kn, prop_i.area),
-            sup2: null
+            sup2: null 
         };
         const e0_1_i = prop_i.y_inf - inputs.cg_cables1;
         const M_p1o_knm = inputs.Poo1_total_kn * e0_1_i;
-        indStresses.p1o_flex = {
-            inf: -flexStress(M_p1o_knm, prop_i.w_inf),
-            sup1: +flexStress(M_p1o_knm, prop_i.w_sup1),
+        indStressesLocal.p1o_flex = {
+            inf: -flexStress(M_p1o_knm, prop_i.w_inf),   
+            sup1: +flexStress(M_p1o_knm, prop_i.w_sup1), 
             sup2: null
         };
 
-        indStresses.p2o_ax = {
-            inf: axialStress(-inputs.Poo2_total_kn, prop_i.area),
-            sup1: axialStress(-inputs.Poo2_total_kn, prop_i.area),
+        // P2o (Etapa 2) - Atua na seção inicial (prop_i), se houver
+        indStressesLocal.p2o_ax = {
+            inf: inputs.num_cables2 > 0 ? axialStress(-inputs.Poo2_total_kn, prop_i.area) : 0,
+            sup1: inputs.num_cables2 > 0 ? axialStress(-inputs.Poo2_total_kn, prop_i.area) : 0,
             sup2: null
         };
-        const e0_2_i = prop_i.y_inf - inputs.cg_cables2;
+        const e0_2_i = (inputs.num_cables2 > 0 && inputs.cg_cables2 > 1e-9) ? (prop_i.y_inf - inputs.cg_cables2) : 0;
         const M_p2o_knm = inputs.Poo2_total_kn * e0_2_i;
-        indStresses.p2o_flex = {
-            inf: -flexStress(M_p2o_knm, prop_i.w_inf),
-            sup1: +flexStress(M_p2o_knm, prop_i.w_sup1),
+        indStressesLocal.p2o_flex = {
+            inf: inputs.num_cables2 > 0 ? -flexStress(M_p2o_knm, prop_i.w_inf) : 0,
+            sup1: inputs.num_cables2 > 0 ? +flexStress(M_p2o_knm, prop_i.w_sup1) : 0,
             sup2: null
         };
         
+        // Delta P1 (Perdas da Protensão 1) - Efeito na seção final (prop_f)
+        const delta_P1_force_kn = inputs.Pinf1_total_kn - inputs.Poo1_total_kn; // Força de variação (negativa se perda)
+        indStressesLocal.delta_p1_ax = {
+            inf: axialStress(delta_P1_force_kn, prop_f.area),
+            sup1: axialStress(delta_P1_force_kn, prop_f.area), // Tensão na fibra sup1 da seção final
+            sup2: axialStress(delta_P1_force_kn, prop_f.area)  // Tensão na fibra sup2 da seção final
+        };
+        const delta_M_p1_knm = delta_P1_force_kn * (prop_f.y_inf - inputs.cg_cables1); // Momento devido à variação de força na seção final
+        indStressesLocal.delta_p1_flex = {
+            inf: -flexStress(delta_M_p1_knm, prop_f.w_inf),
+            sup1: +flexStress(delta_M_p1_knm, prop_f.w_sup1),
+            sup2: +flexStress(delta_M_p1_knm, prop_f.w_sup2)
+        };
+
+        // Delta P2 (Perdas da Protensão 2) - Efeito na seção final (prop_f), se houver
+        if (inputs.num_cables2 > 0) {
+            const delta_P2_force_kn = inputs.Pinf2_total_kn - inputs.Poo2_total_kn;
+            indStressesLocal.delta_p2_ax = {
+                inf: axialStress(delta_P2_force_kn, prop_f.area),
+                sup1: axialStress(delta_P2_force_kn, prop_f.area),
+                sup2: axialStress(delta_P2_force_kn, prop_f.area)
+            };
+            const e0_2_f = (inputs.cg_cables2 > 1e-9) ? (prop_f.y_inf - inputs.cg_cables2) : 0;
+            const delta_M_p2_knm = delta_P2_force_kn * e0_2_f;
+            indStressesLocal.delta_p2_flex = {
+                inf: -flexStress(delta_M_p2_knm, prop_f.w_inf),
+                sup1: +flexStress(delta_M_p2_knm, prop_f.w_sup1),
+                sup2: +flexStress(delta_M_p2_knm, prop_f.w_sup2)
+            };
+        } else {
+            indStressesLocal.delta_p2_ax = { inf: 0, sup1: 0, sup2: 0 };
+            indStressesLocal.delta_p2_flex = { inf: 0, sup1: 0, sup2: 0 };
+        }
+
+        // Cargas G1, G2, G3, Q (Axial e Flexão)
+        indStressesLocal.ng1_ax = { inf: axialStress(inputs.ng1_kn, prop_i.area), sup1: axialStress(inputs.ng1_kn, prop_i.area), sup2: null };
+        indStressesLocal.mg1_flex = { inf: +flexStress(inputs.mg1_knm, prop_i.w_inf), sup1: -flexStress(inputs.mg1_knm, prop_i.w_sup1), sup2: null };
+        
+        indStressesLocal.ng2_ax = { inf: axialStress(inputs.ng2_kn, prop_i.area), sup1: axialStress(inputs.ng2_kn, prop_i.area), sup2: null };
+        indStressesLocal.mg2_flex = { inf: +flexStress(inputs.mg2_knm, prop_i.w_inf), sup1: -flexStress(inputs.mg2_knm, prop_i.w_sup1), sup2: null };
+        
+        indStressesLocal.ng3_ax = { inf: axialStress(inputs.ng3_kn, prop_f.area), sup1: axialStress(inputs.ng3_kn, prop_f.area), sup2: axialStress(inputs.ng3_kn, prop_f.area) };
+        indStressesLocal.mg3_flex = { inf: +flexStress(inputs.mg3_knm, prop_f.w_inf), sup1: -flexStress(inputs.mg3_knm, prop_f.w_sup1), sup2: -flexStress(inputs.mg3_knm, prop_f.w_sup2) };
+        
+        indStressesLocal.nq_ax = { inf: axialStress(inputs.nq_kn, prop_f.area), sup1: axialStress(inputs.nq_kn, prop_f.area), sup2: axialStress(inputs.nq_kn, prop_f.area) };
+        indStressesLocal.mq_flex = { inf: +flexStress(inputs.mq_knm, prop_f.w_inf), sup1: -flexStress(inputs.mq_knm, prop_f.w_sup1), sup2: -flexStress(inputs.mq_knm, prop_f.w_sup2) };
+        
+        // Mantendo p1oo e p2oo para cálculo de Md_final e tabela de tensões individuais (se necessário em outro lugar)
+        // Esses não serão usados diretamente nos diagramas decompostos das combinações 4 e 5, mas são corretos para o efeito líquido.
         const P0_1_kn = inputs.Poo1_total_kn;
         const Pinf_1_kn = inputs.Pinf1_total_kn;
-        const delta_P1_kn = P0_1_kn - Pinf_1_kn; 
+        const d_P1_kn = P0_1_kn - Pinf_1_kn;
         const cg1 = inputs.cg_cables1;
-        indStresses.p1oo_ax = { 
-            inf:  axialStress(-P0_1_kn, prop_i.area) + axialStress(delta_P1_kn, prop_f.area),
-            sup1: axialStress(-P0_1_kn, prop_i.area) + axialStress(delta_P1_kn, prop_f.area),
-            sup2: axialStress(delta_P1_kn, prop_f.area) 
+        indStressesLocal.p1oo_ax = { 
+            inf:  axialStress(-P0_1_kn, prop_i.area) + axialStress(d_P1_kn, prop_f.area),
+            sup1: axialStress(-P0_1_kn, prop_i.area) + axialStress(d_P1_kn, prop_f.area), 
+            sup2: axialStress(d_P1_kn, prop_f.area) 
         };
-        const exc_1_i = prop_i.y_inf - cg1;
-        const exc_1_f = prop_f.y_inf - cg1;
-        indStresses.p1oo_flex = {
-            inf:  -flexStress(P0_1_kn * exc_1_i, prop_i.w_inf)   + flexStress(delta_P1_kn * exc_1_f, prop_f.w_inf),
-            sup1: +flexStress(P0_1_kn * exc_1_i, prop_i.w_sup1) - flexStress(delta_P1_kn * exc_1_f, prop_f.w_sup1),
-            sup2: -flexStress(delta_P1_kn * exc_1_f, prop_f.w_sup2)
+        const exc_1_i = prop_i.y_inf - cg1; 
+        const exc_1_f = prop_f.y_inf - cg1; 
+        indStressesLocal.p1oo_flex = {
+            inf:  -flexStress(P0_1_kn * exc_1_i, prop_i.w_inf)   + flexStress(d_P1_kn * exc_1_f, prop_f.w_inf),
+            sup1: +flexStress(P0_1_kn * exc_1_i, prop_i.w_sup1) - flexStress(d_P1_kn * exc_1_f, prop_f.w_sup1), 
+            sup2:                                                - flexStress(d_P1_kn * exc_1_f, prop_f.w_sup2)  
         };
+         if (inputs.num_cables2 > 0) {
+            const P0_2_kn = inputs.Poo2_total_kn;
+            const Pinf_2_kn = inputs.Pinf2_total_kn;
+            const d_P2_kn = P0_2_kn - Pinf_2_kn;
+            const cg2 = inputs.cg_cables2;
+            indStressesLocal.p2oo_ax = { 
+                inf:  axialStress(-P0_2_kn, prop_i.area) + axialStress(d_P2_kn, prop_f.area),
+                sup1: axialStress(-P0_2_kn, prop_i.area) + axialStress(d_P2_kn, prop_f.area),
+                sup2: axialStress(d_P2_kn, prop_f.area)
+            };
+            const exc_2_i = (cg2 > 1e-9) ? (prop_i.y_inf - cg2) : 0;
+            const exc_2_f = (cg2 > 1e-9) ? (prop_f.y_inf - cg2) : 0;
+            indStressesLocal.p2oo_flex = {
+                inf:  -flexStress(P0_2_kn * exc_2_i, prop_i.w_inf)  + flexStress(d_P2_kn * exc_2_f, prop_f.w_inf),
+                sup1: +flexStress(P0_2_kn * exc_2_i, prop_i.w_sup1) - flexStress(d_P2_kn * exc_2_f, prop_f.w_sup1),
+                sup2:                                                 - flexStress(d_P2_kn * exc_2_f, prop_f.w_sup2)
+            };
+        } else {
+            indStressesLocal.p2oo_ax = { inf: 0, sup1: 0, sup2: 0 };
+            indStressesLocal.p2oo_flex = { inf: 0, sup1: 0, sup2: 0 };
+        }
 
-        const P0_2_kn = inputs.Poo2_total_kn;
-        const Pinf_2_kn = inputs.Pinf2_total_kn;
-        const delta_P2_kn = P0_2_kn - Pinf_2_kn; 
-        const cg2 = inputs.cg_cables2;
-        indStresses.p2oo_ax = { 
-            inf:  axialStress(-P0_2_kn, prop_i.area) + axialStress(delta_P2_kn, prop_f.area),
-            sup1: axialStress(-P0_2_kn, prop_i.area) + axialStress(delta_P2_kn, prop_f.area),
-            sup2: axialStress(delta_P2_kn, prop_f.area)
-        };
-        const exc_2_i = prop_i.y_inf - cg2;
-        const exc_2_f = prop_f.y_inf - cg2;
-        indStresses.p2oo_flex = {
-            inf:  -flexStress(P0_2_kn * exc_2_i, prop_i.w_inf)   + flexStress(delta_P2_kn * exc_2_f, prop_f.w_inf),
-            sup1: +flexStress(P0_2_kn * exc_2_i, prop_i.w_sup1) - flexStress(delta_P2_kn * exc_2_f, prop_f.w_sup1),
-            sup2: -flexStress(delta_P2_kn * exc_2_f, prop_f.w_sup2)
-        };
 
-        indStresses.ng1 = { inf: axialStress(inputs.ng1_kn, prop_i.area), sup1: axialStress(inputs.ng1_kn, prop_i.area), sup2: null };
-        indStresses.mg1 = { inf: +flexStress(inputs.mg1_knm, prop_i.w_inf), sup1: -flexStress(inputs.mg1_knm, prop_i.w_sup1), sup2: null };
-        indStresses.ng2 = { inf: axialStress(inputs.ng2_kn, prop_i.area), sup1: axialStress(inputs.ng2_kn, prop_i.area), sup2: null };
-        indStresses.mg2 = { inf: +flexStress(inputs.mg2_knm, prop_i.w_inf), sup1: -flexStress(inputs.mg2_knm, prop_i.w_sup1), sup2: null };
-        
-        indStresses.ng3 = { inf: axialStress(inputs.ng3_kn, prop_f.area), sup1: axialStress(inputs.ng3_kn, prop_f.area), sup2: axialStress(inputs.ng3_kn, prop_f.area) };
-        indStresses.mg3 = { inf: +flexStress(inputs.mg3_knm, prop_f.w_inf), sup1: -flexStress(inputs.mg3_knm, prop_f.w_sup1), sup2: -flexStress(inputs.mg3_knm, prop_f.w_sup2) };
-        indStresses.nq = { inf: axialStress(inputs.nq_kn, prop_f.area), sup1: axialStress(inputs.nq_kn, prop_f.area), sup2: axialStress(inputs.nq_kn, prop_f.area) };
-        indStresses.mq = { inf: +flexStress(inputs.mq_knm, prop_f.w_inf), sup1: -flexStress(inputs.mq_knm, prop_f.w_sup1), sup2: -flexStress(inputs.mq_knm, prop_f.w_sup2) };
-
-        return indStresses; 
+        window.currentIndStresses = indStressesLocal; 
+        return indStressesLocal; 
     }
     
-    // Função calculateDecompressionMoments ajustada para usar tensões individuais
-    function calculateDecompressionMoments(inputs, properties, individualStresses_knm2) {
+    function calculateDecompressionMoments(inputs, properties, indStressesToUse) {
         const { inicial: prop_i, final: prop_f } = properties;
 
-        // Md,inicial (baseado nas tensões de P0 na fibra inferior da seção inicial)
         let sigma_inf_P0_kn = 0;
-        sigma_inf_P0_kn += safeGet(individualStresses_knm2.p1o_ax, 'inf');
-        sigma_inf_P0_kn += safeGet(individualStresses_knm2.p1o_flex, 'inf');
-        if (inputs.num_cables2 > 0) { // Considerar P2o apenas se houver cabos na Etapa 2
-            sigma_inf_P0_kn += safeGet(individualStresses_knm2.p2o_ax, 'inf');
-            sigma_inf_P0_kn += safeGet(individualStresses_knm2.p2o_flex, 'inf');
+        sigma_inf_P0_kn += safeGet(indStressesToUse.p1o_ax, 'inf') + safeGet(indStressesToUse.p1o_flex, 'inf');
+        if (inputs.num_cables2 > 0) { 
+            sigma_inf_P0_kn += safeGet(indStressesToUse.p2o_ax, 'inf') + safeGet(indStressesToUse.p2o_flex, 'inf');
         }
-        
         const sigma_inf_P0_tfm2 = sigma_inf_P0_kn * KN_M2_TO_TF_M2;
         const Md1_tfm = (prop_i.w_inf > 1e-9 && sigma_inf_P0_tfm2 !== 0) ? (-sigma_inf_P0_tfm2) * prop_i.w_inf : 0;
 
-        // Md,final (baseado nas tensões de P∞ na fibra inferior da seção final)
+        // Para Md_final, usamos o efeito LÍQUIDO de Pinf (P0 na seção inicial + DeltaP na seção final)
         let sigma_inf_Pinf_kn = 0;
-        sigma_inf_Pinf_kn += safeGet(individualStresses_knm2.p1oo_ax, 'inf');
-        sigma_inf_Pinf_kn += safeGet(individualStresses_knm2.p1oo_flex, 'inf');
-        if (inputs.num_cables2 > 0) { // Considerar P2inf apenas se houver cabos na Etapa 2
-             sigma_inf_Pinf_kn += safeGet(individualStresses_knm2.p2oo_ax, 'inf');
-             sigma_inf_Pinf_kn += safeGet(individualStresses_knm2.p2oo_flex, 'inf');
+        sigma_inf_Pinf_kn += safeGet(indStressesToUse.p1oo_ax, 'inf') + safeGet(indStressesToUse.p1oo_flex, 'inf');
+        if (inputs.num_cables2 > 0 && indStressesToUse.p2oo_ax) { // Verifica se p2oo_ax existe
+             sigma_inf_Pinf_kn += safeGet(indStressesToUse.p2oo_ax, 'inf') + safeGet(indStressesToUse.p2oo_flex, 'inf');
         }
-
         const sigma_inf_Pinf_tfm2 = sigma_inf_Pinf_kn * KN_M2_TO_TF_M2;
         const Md2_tfm = (prop_f.w_inf > 1e-9 && sigma_inf_Pinf_tfm2 !== 0) ? (-sigma_inf_Pinf_tfm2) * prop_f.w_inf : 0;
         
         return { Md1_tfm, Md2_tfm };
     }
 
-
-    const sumFiberStress = (fiber, stressSources) => {
-        let totalStress = 0;
-        stressSources.forEach(source => {
-            const axialVal = safeGet(indStresses[source.ax], fiber); // indStresses é global
-            const flexVal = safeGet(indStresses[source.flex], fiber); // indStresses é global
-            const multiplier = source.multiplier !== undefined ? source.multiplier : 1.0;
-            totalStress += (axialVal + flexVal) * multiplier;
+    // Sums stresses for a specific fiber from multiple sources (axial and flexural components)
+    const sumStressesForCombination = (fiber, components, indStressesToUse) => {
+        let totalStress_knm2 = 0;
+        components.forEach(comp => {
+            const axialStressComp = comp.stressKeyAx ? safeGet(indStressesToUse[comp.stressKeyAx], fiber) : 0;
+            const flexuralStressComp = comp.stressKeyFlex ? safeGet(indStressesToUse[comp.stressKeyFlex], fiber) : 0;
+            totalStress_knm2 += (axialStressComp + flexuralStressComp) * comp.multiplier;
         });
-        return totalStress;
+        return totalStress_knm2;
     };
     
-    function calculateCombinedStressesAndVerifications(inputs, limits_tfm2) { 
-        const results = [];
+    function calculateCombinedStressesAndVerifications(inputs, limits_tfm2, indStressesToUse, properties) {
+        const results = []; 
         const eta = inputs.ato_percentage / 100.0;
+        const combinationDefinitions = getCombinationDefinitions(inputs, eta); // Pega as definições dos componentes
 
-        // Verificação 0 (ATO: eta * 1.1 * P1o + G1) - Seção Inicial
-        const stress0_inf_kn = sumFiberStress('inf', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'p1o_ax', flex: 'p1o_flex', multiplier: eta * 1.1 } ]);
-        const stress0_sup1_kn = sumFiberStress('sup1', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'p1o_ax', flex: 'p1o_flex', multiplier: eta * 1.1 } ]);
-        results.push({ inf: stress0_inf_kn * KN_M2_TO_TF_M2, sup1: stress0_sup1_kn * KN_M2_TO_TF_M2, sup2: null });
-
-        // Verificação 1 (ATO: 1.1 * (P1o + P2o) + G1) - Seção Inicial
-        const stress1_inf_kn = sumFiberStress('inf', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'p1o_ax', flex: 'p1o_flex', multiplier: 1.1 }, { ax: 'p2o_ax', flex: 'p2o_flex', multiplier: 1.1 } ]);
-        const stress1_sup1_kn = sumFiberStress('sup1', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'p1o_ax', flex: 'p1o_flex', multiplier: 1.1 }, { ax: 'p2o_ax', flex: 'p2o_flex', multiplier: 1.1 } ]);
-        results.push({ inf: stress1_inf_kn * KN_M2_TO_TF_M2, sup1: stress1_sup1_kn * KN_M2_TO_TF_M2, sup2: null });
-
-        // Verificação 2 (Intermediária: P1o + G1 + G2) - Seção Inicial
-        const stress2_inf_kn = sumFiberStress('inf', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'p1o_ax', flex: 'p1o_flex'} ]);
-        const stress2_sup1_kn = sumFiberStress('sup1', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'p1o_ax', flex: 'p1o_flex'} ]);
-        results.push({ inf: stress2_inf_kn * KN_M2_TO_TF_M2, sup1: stress2_sup1_kn * KN_M2_TO_TF_M2, sup2: null });
-
-        // Verificação 3 (Intermediária: G1 + G2 + Po1 + Po2)
-        const stress3_inf_kn = sumFiberStress('inf', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'p1o_ax', flex: 'p1o_flex'}, { ax: 'p2o_ax', flex: 'p2o_flex'} ]);
-        const stress3_sup1_kn = sumFiberStress('sup1', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'p1o_ax', flex: 'p1o_flex'}, { ax: 'p2o_ax', flex: 'p2o_flex'} ]);
-        const stress3_sup2_kn = 0; 
-        results.push({ inf: stress3_inf_kn * KN_M2_TO_TF_M2, sup1: stress3_sup1_kn * KN_M2_TO_TF_M2, sup2: stress3_sup2_kn * KN_M2_TO_TF_M2 });
-
-
-        // Verificação 4 (ELS-F: P1inf + P2inf + G1+G2+G3 + psi1*Q) - Seção Final
-        const stress4_inf_kn = sumFiberStress('inf', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'ng3', flex: 'mg3'}, { ax: 'nq', flex: 'mq', multiplier: inputs.psi1}, { ax: 'p1oo_ax', flex: 'p1oo_flex'}, { ax: 'p2oo_ax', flex: 'p2oo_flex'} ]);
-        const stress4_sup1_kn = sumFiberStress('sup1', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'ng3', flex: 'mg3'}, { ax: 'nq', flex: 'mq', multiplier: inputs.psi1}, { ax: 'p1oo_ax', flex: 'p1oo_flex'}, { ax: 'p2oo_ax', flex: 'p2oo_flex'} ]);
-        const stress4_sup2_kn = sumFiberStress('sup2', [ { ax: 'ng3', flex: 'mg3'}, { ax: 'nq', flex: 'mq', multiplier: inputs.psi1}, { ax: 'p1oo_ax', flex: 'p1oo_flex'}, { ax: 'p2oo_ax', flex: 'p2oo_flex'} ]);
-        results.push({ inf: stress4_inf_kn * KN_M2_TO_TF_M2, sup1: stress4_sup1_kn * KN_M2_TO_TF_M2, sup2: stress4_sup2_kn * KN_M2_TO_TF_M2 });
-
-        // Verificação 5 (ELS-D: P1inf + P2inf + G1+G2+G3 + psi2*Q) - Seção Final
-        const stress5_inf_kn = sumFiberStress('inf', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'ng3', flex: 'mg3'}, { ax: 'nq', flex: 'mq', multiplier: inputs.psi2}, { ax: 'p1oo_ax', flex: 'p1oo_flex'}, { ax: 'p2oo_ax', flex: 'p2oo_flex'} ]);
-        const stress5_sup1_kn = sumFiberStress('sup1', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'ng3', flex: 'mg3'}, { ax: 'nq', flex: 'mq', multiplier: inputs.psi2}, { ax: 'p1oo_ax', flex: 'p1oo_flex'}, { ax: 'p2oo_ax', flex: 'p2oo_flex'} ]);
-        const stress5_sup2_kn = sumFiberStress('sup2', [ { ax: 'ng3', flex: 'mg3'}, { ax: 'nq', flex: 'mq', multiplier: inputs.psi2}, { ax: 'p1oo_ax', flex: 'p1oo_flex'}, { ax: 'p2oo_ax', flex: 'p2oo_flex'} ]);
-        results.push({ inf: stress5_inf_kn * KN_M2_TO_TF_M2, sup1: stress5_sup1_kn * KN_M2_TO_TF_M2, sup2: stress5_sup2_kn * KN_M2_TO_TF_M2 });
-        
-        results.forEach((stress_tfm2, i) => {
-            const limit = limits_tfm2[i];
-            const checkFiber = (stressVal, limitVal) => {
-                if (limitVal === null || stressVal === null || isNaN(stressVal) || isNaN(limitVal)) return true;
-                const tolerance = 1e-2; 
-                if (limitVal >= 0) { 
-                    return stressVal <= limitVal + tolerance;
-                } else { 
-                    return stressVal >= limitVal - tolerance;
-                }
+        combinationDefinitions.forEach(comboDef => {
+            const stresses_kn = {
+                inf: sumStressesForCombination('inf', comboDef.components, indStressesToUse),
+                sup1: sumStressesForCombination('sup1', comboDef.components, indStressesToUse),
+                sup2: sumStressesForCombination('sup2', comboDef.components, indStressesToUse)
             };
-            const check_inf = checkFiber(stress_tfm2.inf, limit.inf);
-            const check_sup1 = checkFiber(stress_tfm2.sup1, limit.sup1);
-            const check_sup2 = checkFiber(stress_tfm2.sup2, limit.sup2);
-            stress_tfm2.check = (check_inf && check_sup1 && check_sup2) ? '<span class="verification-ok">OK</span>' : '<span class="verification-fail">FALHA</span>';
+            results.push({
+                inf: stresses_kn.inf * KN_M2_TO_TF_M2,
+                sup1: stresses_kn.sup1 * KN_M2_TO_TF_M2,
+                sup2: (stresses_kn.sup2 === null || (comboDef.resultStressFiberSupKey !== 'sup2' && comboDef.resultDiagramSectionHeightKey === 'inicial.h_total' )) ? null : stresses_kn.sup2 * KN_M2_TO_TF_M2,
+                 // Adicionado para referência na tabela, pode ser diferente do usado no diagrama resultante se a comb. 3 for ajustada
+                actualSup1ForTable: stresses_kn.sup1 * KN_M2_TO_TF_M2,
+                actualSup2ForTable: stresses_kn.sup2 === null ? null : stresses_kn.sup2 * KN_M2_TO_TF_M2
+            });
         });
+        
+        if (limits_tfm2 && limits_tfm2.length === results.length) {
+            results.forEach((stress_tfm2, i) => {
+                const limit = limits_tfm2[i];
+                const checkFiber = (stressVal, limitVal) => {
+                    if (limitVal === null || stressVal === null || isNaN(stressVal) || isNaN(limitVal)) return true; 
+                    const tolerance = 1e-1; 
+                    if (limitVal >= 0) { 
+                        return stressVal <= limitVal + tolerance;
+                    } else { 
+                        return stressVal >= limitVal - tolerance;
+                    }
+                };
+                // Para a tabela de tensões calculadas, usamos as tensões reais em cada fibra relevante
+                const check_inf = checkFiber(stress_tfm2.inf, limit.inf);
+                const check_sup1 = checkFiber(stress_tfm2.actualSup1ForTable, limit.sup1); // Usa a tensão real em sup1
+                const check_sup2 = checkFiber(stress_tfm2.actualSup2ForTable, limit.sup2); // Usa a tensão real em sup2
 
+                stress_tfm2.check = (check_inf && check_sup1 && check_sup2) ? '<span class="verification-ok">OK</span>' : '<span class="verification-fail">FALHA</span>';
+            });
+        }
         return results;
     }
 
-
     // --- Funções de Atualização da Interface (UI) ---
-    function populatePropertiesTable(properties) {
+    function populatePropertiesTable(properties) { 
         updateElementText('area-inicial', formatNumber(properties.inicial.area, 3));
         updateElementText('yinf-inicial', formatNumber(properties.inicial.y_inf, 3));
         updateElementText('ysup-inicial', formatNumber(properties.inicial.y_sup, 3));
@@ -850,74 +928,79 @@
         updateElementText('wsup2-inicial', formatNumber(properties.inicial.w_sup2, 4, true)); 
         updateElementText('area-final', formatNumber(properties.final.area, 3));
         updateElementText('yinf-final', formatNumber(properties.final.y_inf, 3));
-        updateElementText('ysup-final', formatNumber(properties.final.y_sup, 3));
+        updateElementText('ysup-final', formatNumber(properties.final.y_sup, 3)); 
         updateElementText('inercia-final', formatNumber(properties.final.inertia, 5));
         updateElementText('winf-final', formatNumber(properties.final.w_inf, 4));
-        updateElementText('wsup1-final', formatNumber(properties.final.w_sup1, 4));
-        updateElementText('wsup2-final', formatNumber(properties.final.w_sup2, 4));
+        updateElementText('wsup1-final', formatNumber(properties.final.w_sup1, 4)); 
+        updateElementText('wsup2-final', formatNumber(properties.final.w_sup2, 4)); 
     }
-
-    function populateLimitsTable(limits) {
+    function populateLimitsTable(limits) { 
         limits.forEach((limit, i) => {
             updateElementText(`limit-inf-${i}`, formatNumber(limit.inf, 0));
             updateElementText(`limit-sup1-${i}`, formatNumber(limit.sup1, 0));
             updateElementText(`limit-sup2-${i}`, formatNumber(limit.sup2, 0));
         });
     }
-
-    function populateCalculatedStressesTable(combinedStresses) {
-        combinedStresses.forEach((stress, i) => {
+    function populateCalculatedStressesTable(combinedStresses) { 
+         combinedStresses.forEach((stress, i) => {
             updateElementText(`stress-inf-${i}`, formatNumber(stress.inf, 0));
-            updateElementText(`stress-sup1-${i}`, formatNumber(stress.sup1, 0));
-            updateElementText(`stress-sup2-${i}`, formatNumber(stress.sup2, 0));
+            // Para a tabela, mostrar a tensão real em sup1 e sup2, não a que foi usada para o diagrama resultante da comb. 3
+            updateElementText(`stress-sup1-${i}`, formatNumber(stress.actualSup1ForTable, 0));
+            updateElementText(`stress-sup2-${i}`, formatNumber(stress.actualSup2ForTable, 0));
             getElement(`check-${i}`).innerHTML = stress.check;
         });
     }
-
-    function populateIndividualStressesTable(individualStresses_knm2_arg) { 
+    function populateIndividualStressesTable(individualStresses_knm2_arg, inputs) { // Adicionado 'inputs' como parâmetro
         const tbody = getElement('individual-stresses-tbody');
         tbody.innerHTML = '';
         const actionOrderAndNames = [
-            { key_ax: 'p1o_ax', key_flex: 'p1o_flex', name_ax: 'N<sub>p1o</sub>', name_flex: 'M<sub>p1o</sub>' },
-            { key_ax: 'p1oo_ax', key_flex: 'p1oo_flex', name_ax: 'N<sub>p1∞</sub>', name_flex: 'M<sub>p1∞</sub>' },
-            { key_ax: 'p2o_ax', key_flex: 'p2o_flex', name_ax: 'N<sub>p2o</sub>', name_flex: 'M<sub>p2o</sub>' },
-            { key_ax: 'p2oo_ax', key_flex: 'p2oo_flex', name_ax: 'N<sub>p2∞</sub>', name_flex: 'M<sub>p2∞</sub>' },
-            { key_ax: 'ng1', key_flex: 'mg1', name_ax: 'N<sub>g1</sub>', name_flex: 'M<sub>g1</sub>' },
-            { key_ax: 'ng2', key_flex: 'mg2', name_ax: 'N<sub>g2</sub>', name_flex: 'M<sub>g2</sub>' },
-            { key_ax: 'ng3', key_flex: 'mg3', name_ax: 'N<sub>g3</sub>', name_flex: 'M<sub>g3</sub>' },
-            { key_ax: 'nq', key_flex: 'mq', name_ax: 'N<sub>q</sub>', name_flex: 'M<sub>q</sub>' }
+            { key: 'p1o_ax', name: 'N<sub>p1o</sub>' }, { key: 'p1o_flex', name: 'M<sub>p1o</sub>' },
+            { key: 'delta_p1_ax', name: 'N<sub>&Delta;P1</sub>' }, { key: 'delta_p1_flex', name: 'M<sub>&Delta;P1</sub>' },
+            { key: 'p2o_ax', name: 'N<sub>p2o</sub>' }, { key: 'p2o_flex', name: 'M<sub>p2o</sub>' },
+            { key: 'delta_p2_ax', name: 'N<sub>&Delta;P2</sub>' }, { key: 'delta_p2_flex', name: 'M<sub>&Delta;P2</sub>' },
+            { key: 'ng1_ax', name: 'N<sub>g1</sub>' }, { key: 'mg1_flex', name: 'M<sub>g1</sub>' },
+            { key: 'ng2_ax', name: 'N<sub>g2</sub>' }, { key: 'mg2_flex', name: 'M<sub>g2</sub>' },
+            { key: 'ng3_ax', name: 'N<sub>g3</sub>' }, { key: 'mg3_flex', name: 'M<sub>g3</sub>' },
+            { key: 'nq_ax', name: 'N<sub>q</sub>' }, { key: 'mq_flex', name: 'M<sub>q</sub>' }
         ];
+
         actionOrderAndNames.forEach(action => {
-            const addRow = (name, stressObj_knm2) => {
-                if (!stressObj_knm2) return; 
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td class="table-cell font-medium">${name}</td>
-                    <td class="table-cell text-right">${formatNumber(stressObj_knm2.inf !== null ? stressObj_knm2.inf * KN_M2_TO_TF_M2 : null, 0)}</td>
-                    <td class="table-cell text-right">${formatNumber(stressObj_knm2.sup1 !== null ? stressObj_knm2.sup1 * KN_M2_TO_TF_M2 : null, 0)}</td>
-                    <td class="table-cell text-right">${formatNumber(stressObj_knm2.sup2 !== null ? stressObj_knm2.sup2 * KN_M2_TO_TF_M2 : null, 0)}</td>`;
-            };
-            addRow(action.name_ax, individualStresses_knm2_arg[action.key_ax]);
-            addRow(action.name_flex, individualStresses_knm2_arg[action.key_flex]);
+            const stressObj_knm2 = individualStresses_knm2_arg[action.key];
+            if (!stressObj_knm2) return; 
+
+            // Condição para pular componentes delta_p2 se não houver protensão da etapa 2
+            if (action.key.startsWith('delta_p2') && (!inputs || inputs.num_cables2 === 0)) {
+                return;
+            }
+             // Condição para pular componentes p2o se não houver protensão da etapa 2
+            if (action.key.startsWith('p2o_') && (!inputs || inputs.num_cables2 === 0)) {
+                return;
+            }
+
+
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td class="table-cell font-medium">${action.name}</td>
+                <td class="table-cell text-right">${formatNumber(stressObj_knm2.inf !== null ? stressObj_knm2.inf * KN_M2_TO_TF_M2 : null, 0, false, true)}</td>
+                <td class="table-cell text-right">${formatNumber(stressObj_knm2.sup1 !== null ? stressObj_knm2.sup1 * KN_M2_TO_TF_M2 : null, 0, false, true)}</td>
+                <td class="table-cell text-right">${formatNumber(stressObj_knm2.sup2 !== null ? stressObj_knm2.sup2 * KN_M2_TO_TF_M2 : null, 0, false, true)}</td>`;
         });
     }
-    
-    function updateCalculatedPrestressFieldsInActionsTab(prestressMoments, prestressForces) {
-        updateElementValue('mp1o', formatNumber(prestressMoments.Mp1o, 1));
-        updateElementValue('mp2o', formatNumber(prestressMoments.Mp2o, 1));
-        updateElementValue('mp1oo', formatNumber(prestressMoments.Mp1oo, 1));
-        updateElementValue('mp2oo', formatNumber(prestressMoments.Mp2oo, 1));
-        updateElementValue('np1o', formatNumber(prestressForces.Np1o, 1));
-        updateElementValue('np2o', formatNumber(prestressForces.Np2o, 1));
-        updateElementValue('np1oo', formatNumber(prestressForces.Np1oo, 1));
-        updateElementValue('np2oo', formatNumber(prestressForces.Np2oo, 1));
+    function updateCalculatedPrestressFieldsInActionsTab(prestressMoments_tfm, prestressForces_tf) { 
+        updateElementValue('mp1o', formatNumber(prestressMoments_tfm.Mp1o, 1));
+        updateElementValue('mp2o', formatNumber(prestressMoments_tfm.Mp2o, 1));
+        updateElementValue('mp1oo', formatNumber(prestressMoments_tfm.Mp1oo, 1));
+        updateElementValue('mp2oo', formatNumber(prestressMoments_tfm.Mp2oo, 1));
+        updateElementValue('np1o', formatNumber(prestressForces_tf.Np1o, 1));
+        updateElementValue('np2o', formatNumber(prestressForces_tf.Np2o, 1));
+        updateElementValue('np1oo', formatNumber(prestressForces_tf.Np1oo, 1));
+        updateElementValue('np2oo', formatNumber(prestressForces_tf.Np2oo, 1));
     }
-
-    function populateUIWithResults(properties, limits, combinedStresses, individualStresses_arg, prestressMoments_tfm, prestressForces_tf, decompressionMoments_tfm) {
+    function populateUIWithResults(properties, limits, combinedStresses, individualStresses_knm2_arg, prestressMoments_tfm, prestressForces_tf, decompressionMoments_tfm, current_inputs) { // Adicionado current_inputs
         populatePropertiesTable(properties);
         populateLimitsTable(limits);
         populateCalculatedStressesTable(combinedStresses);
-        populateIndividualStressesTable(individualStresses_arg); 
+        populateIndividualStressesTable(individualStresses_knm2_arg, current_inputs); // Passa current_inputs
         updateCalculatedPrestressFieldsInActionsTab(prestressMoments_tfm, prestressForces_tf);
         
         if (decompressionMoments_tfm) {
@@ -927,9 +1010,9 @@
             updateElementText('result-md-inicial', '-');
             updateElementText('result-md-final', '-');
         }
+        updateSuperpositionDisplay(); 
     }
-
-    function updatePrestressForcesAndMomentsInActionsUI() {
+    function updatePrestressForcesAndMomentsInActionsUI() { 
         try {
             const inputs = getInputs(); 
             const properties = calculateGeometricProperties(inputs.geometry, inputs.bf1, inputs.hf1, inputs.bf2, inputs.hf2);
@@ -941,15 +1024,13 @@
             ['mp1o', 'mp2o', 'mp1oo', 'mp2oo', 'np1o', 'np2o', 'np1oo', 'np2oo'].forEach(id => updateElementValue(id, '-'));
         }
     }
-
-    // --- Visualização da Seção (SVG) ---
-    function drawSection() {
+    function drawSection() { 
         const inputs = getInputs();
         try {
             const props = calculateGeometricProperties(inputs.geometry, inputs.bf1, inputs.hf1, inputs.bf2, inputs.hf2);
             const svgWidth = 300, svgHeight = 250, padding = 20; 
             const maxGeoWidth = Math.max( ...inputs.geometry.map(el => Math.max(el.binf, el.bsup)), inputs.bf1, inputs.bf2, 0.1 ); 
-            const totalHeight = props.final.h_total;
+            const totalHeight = props.final.h_total > 1e-9 ? props.final.h_total : props.inicial.h_total; 
 
             if (maxGeoWidth <= 1e-9 || totalHeight <= 1e-9 || !isFinite(maxGeoWidth) || !isFinite(totalHeight)) {
                 visualizationDiv.innerHTML = '<span class="text-sm italic">Dimensões inválidas para desenho.</span>'; return;
@@ -963,15 +1044,17 @@
             const offsetX = (svgWidth - scaledTotalWidth) / 2; 
             const offsetY = svgHeight - padding; 
 
-            let svgContent = `<svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="${svgWidth}" height="${svgHeight}" fill="#f9fafb"/>`;
+            let svgContent = `<svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" xmlns="${SVG_NS}"><rect x="0" y="0" width="${svgWidth}" height="${svgHeight}" fill="#f9fafb"/>`;
             let currentY_base_drawing_m = 0; 
 
             inputs.geometry.forEach((el, index) => {
-                if (el.h <= 0) return;
+                if (el.h <= 0) return; 
                 const y_bottom_el_m = currentY_base_drawing_m;
                 const y_top_el_m = currentY_base_drawing_m + el.h;
+                
                 const y_bottom_el_svg = offsetY - y_bottom_el_m * scale;
                 const y_top_el_svg = offsetY - y_top_el_m * scale;
+
                 const x_offset_inf_el = (maxGeoWidth - el.binf) / 2; 
                 const x_offset_sup_el = (maxGeoWidth - el.bsup) / 2;
 
@@ -990,9 +1073,11 @@
                 if (h_layer <= 0 || b_layer <= 0) return;
                 const y_bottom_layer_m = y_base_layer_m;
                 const y_top_layer_m = y_base_layer_m + h_layer;
+
                 const y_bottom_layer_svg = offsetY - y_bottom_layer_m * scale;
                 const y_top_layer_svg = offsetY - y_top_layer_m * scale;
-                const x_offset_layer = (maxGeoWidth - b_layer) / 2;
+
+                const x_offset_layer = (maxGeoWidth - b_layer) / 2; 
                 svgContent += `<rect x="${offsetX + x_offset_layer * scale}" y="${y_top_layer_svg}" width="${b_layer * scale}" height="${h_layer * scale}" fill="${color}" stroke="#6b7280" stroke-width="0.5"/>`;
             };
             drawLayer(inputs.hf1, inputs.bf1, props.inicial.h_total, "#e5e7eb"); 
@@ -1000,16 +1085,19 @@
 
             const cg_radius = 2.5;
             const cg_center_x_svg = svgWidth / 2; 
+            
             const drawCGCable = (cg_y_m, num_cables, color, label) => {
-                if (num_cables > 0 && cg_y_m > 0 && cg_y_m <= totalHeight) {
+                if (num_cables > 0 && cg_y_m > 0 && cg_y_m <= totalHeight) { 
                     const cg_y_svg = offsetY - cg_y_m * scale;
                     svgContent += `<circle cx="${cg_center_x_svg}" cy="${cg_y_svg}" r="${cg_radius}" fill="none" stroke="${color}" stroke-width="1"/>`;
                     svgContent += `<text x="${cg_center_x_svg + cg_radius + 2}" y="${cg_y_svg + cg_radius / 2}" fill="${color}" class="cg-label" text-anchor="start" dominant-baseline="middle">${label}</text>`;
                 }
             };
             drawCGCable(inputs.cg_cables1, inputs.num_cables1, "red", "P1");
-            drawCGCable(inputs.cg_cables2, inputs.num_cables2, "blue", "P2");
-
+            if (inputs.num_cables2 > 0 && inputs.cg_cables2 > 1e-9) { 
+                drawCGCable(inputs.cg_cables2, inputs.num_cables2, "blue", "P2");
+            }
+            
             svgContent += '</svg>';
             visualizationDiv.innerHTML = svgContent;
         } catch (error) {
@@ -1018,41 +1106,454 @@
         }
     }
 
+    /**
+     * Desenha um diagrama de tensões com até 3 fibras, adaptado da função fornecida pelo usuário.
+     * @param {number[]} sigma_tfm2_array - Array de tensões [σinf, σsup1, σsup2] em tf/m². σsup1 e σsup2 podem ser null.
+     * @param {number} ySup1_m - Altura em metros da fibra sup1 (topo da viga) a partir da base da seção.
+     * @param {number} hTotalComponent_m - Altura total da seção para este componente do diagrama (pode ser h_viga ou h_total_final).
+     * @param {string} title - Título do diagrama.
+     * @param {number} globalSigmaRef_tfm2 - Tensão de referência global para a combinação (para escala proporcional).
+     */
+    function drawStressDiagramEnhanced(sigma_tfm2_array, ySup1_m, hTotalComponent_m, title, globalSigmaRef_tfm2) {
+        const [s_inf, s_sup1, s_sup2_raw] = sigma_tfm2_array;
+        
+        // Trata null/NaN como 0 para cálculos internos do desenho, mas preserva null para lógica de rótulos
+        const ds_inf = (s_inf === null || isNaN(s_inf)) ? 0 : s_inf;
+        const ds_sup1 = (s_sup1 === null || isNaN(s_sup1)) ? 0 : s_sup1;
+        let ds_sup2 = (s_sup2_raw === null || isNaN(s_sup2_raw)) ? ds_sup1 : s_sup2_raw; // Se sup2 não existe, usa sup1 para fechar o diagrama
+
+        // Se a altura do componente é apenas a da viga, sup2 é igual a sup1 para o desenho do polígono
+        if (hTotalComponent_m <= ySup1_m + 1e-3) {
+            ds_sup2 = ds_sup1;
+        }
+
+        const W = 100, H = 160;
+        const pad = { top: 25, bottom: 25, left: 20, right: 20 };
+        const Xc = W / 2;
+
+        const yInf_px = H - pad.bottom; 
+        const ySup2_px = pad.top;
+        const diagramHeight_px = H - pad.top - pad.bottom;
+        const ySup1_px = yInf_px - (ySup1_m / hTotalComponent_m) * diagramHeight_px;
+        
+        const scale = globalSigmaRef_tfm2 > 1e-6 ? (W - pad.left - pad.right) / 2 / globalSigmaRef_tfm2 : 0;
+
+        const xInf = Xc + ds_inf * scale;
+        const xSup1_draw = Xc + ds_sup1 * scale;
+        const xSup2_draw = Xc + ds_sup2 * scale;
+
+        let pointsList = [];
+        pointsList.push(`${Xc},${yInf_px}`);
+        pointsList.push(`${xInf},${yInf_px}`);
+
+        if (hTotalComponent_m > ySup1_m + 1e-3 && Math.abs(ds_sup2 - ds_sup1) > 1e-6 * Math.abs(globalSigmaRef_tfm2)) { 
+            pointsList.push(`${xSup1_draw},${ySup1_px}`);
+            pointsList.push(`${xSup2_draw},${ySup2_px}`);
+        } else { 
+            pointsList.push(`${xSup1_draw},${ySup2_px}`); 
+        }
+        pointsList.push(`${Xc},${ySup2_px}`);
+        const pts = pointsList.join(' ');
+
+        const svg = document.createElementNS(SVG_NS, 'svg');
+        svg.setAttribute('width', W);
+        svg.setAttribute('height', H);
+        svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+        
+        const bg = document.createElementNS(SVG_NS, 'rect');
+        bg.setAttribute('x', 0); bg.setAttribute('y', 0);
+        bg.setAttribute('width', W); bg.setAttribute('height', H);
+        bg.setAttribute('fill', '#f9fafb');
+        svg.appendChild(bg);
+
+        const poly = document.createElementNS(SVG_NS, 'polygon');
+        poly.setAttribute('points', pts);
+
+        let colorType = 'mix';
+        const allStressesForColor = [ds_inf, ds_sup1];
+        if (hTotalComponent_m > ySup1_m + 1e-3) { // Considera ds_sup2 para cor apenas se for seção composta
+            allStressesForColor.push(ds_sup2);
+        }
+        const hasPositive = allStressesForColor.some(v => v > 1e-3);
+        const hasNegative = allStressesForColor.some(v => v < -1e-3);
+
+        if (hasPositive && !hasNegative) colorType = 'tens';
+        else if (!hasPositive && hasNegative) colorType = 'comp';
+        else if (!hasPositive && !hasNegative) colorType = 'null';
+
+
+        if (colorType === 'comp') {
+            poly.setAttribute('fill', 'rgba(252,165,165,0.35)'); poly.setAttribute('stroke', 'rgba(185,28,28,0.8)');
+        } else if (colorType === 'tens') {
+            poly.setAttribute('fill', 'rgba(134,239,172,0.35)'); poly.setAttribute('stroke', 'rgba(22,163,74,0.8)');
+        } else if (colorType === 'mix') {
+            poly.setAttribute('fill', 'rgba(165,180,252,0.35)'); poly.setAttribute('stroke', 'rgba(79,70,229,0.8)');
+        } else { 
+             poly.setAttribute('fill', 'none'); poly.setAttribute('stroke', 'none');
+        }
+        poly.setAttribute('stroke-width', '0.6');
+        svg.appendChild(poly);
+
+        const axisLine = document.createElementNS(SVG_NS, "line");
+        axisLine.setAttribute("x1", Xc); axisLine.setAttribute("y1", ySup2_px);
+        axisLine.setAttribute("x2", Xc); axisLine.setAttribute("y2", yInf_px);
+        axisLine.setAttribute("stroke", "#333"); axisLine.setAttribute("stroke-width", "0.5");
+        svg.appendChild(axisLine);
+
+        const effectiveSupStressForLN = (hTotalComponent_m > ySup1_m + 1e-3) ? ds_sup2 : ds_sup1;
+        if ((ds_inf < -1e-3 && effectiveSupStressForLN > 1e-3) || (ds_inf > 1e-3 && effectiveSupStressForLN < -1e-3)) {
+            const yn = yInf_px - (Math.abs(ds_inf) / (Math.abs(ds_inf) + Math.abs(effectiveSupStressForLN))) * (yInf_px - ySup2_px);
+            if (isFinite(yn)) { // Adiciona linha neutra apenas se yn for um número finito
+                const ln = document.createElementNS(SVG_NS, 'line');
+                ln.setAttribute('x1', Xc - (W/2 - pad.left) * 0.8); ln.setAttribute('x2', Xc + (W/2 - pad.right) * 0.8);
+                ln.setAttribute('y1', yn); ln.setAttribute('y2', yn);
+                ln.setAttribute('stroke', '#555'); ln.setAttribute('stroke-dasharray', '2,1');
+                ln.setAttribute('stroke-width', '0.5');
+                svg.appendChild(ln);
+            }
+        }
+        
+        const titleTextElement = document.createElementNS(SVG_NS, 'text');
+        titleTextElement.setAttribute('x', Xc);
+        titleTextElement.setAttribute('y', pad.top - 10);
+        titleTextElement.setAttribute('text-anchor', 'middle');
+        titleTextElement.style.fontSize = '10px';
+        titleTextElement.style.fontWeight = '600';
+        titleTextElement.innerHTML = title; 
+        svg.appendChild(titleTextElement);
+
+        const stressesToLabelConfig = [
+            { rawVal: s_inf, displayVal: ds_inf, y: yInf_px, x_offset_val_for_pos: ds_inf },
+            { rawVal: s_sup1, displayVal: ds_sup1, y: ySup1_px, x_offset_val_for_pos: ds_sup1 }
+        ];
+        if (hTotalComponent_m > ySup1_m + 1e-3) { 
+            stressesToLabelConfig.push({ rawVal: s_sup2_raw, displayVal: ds_sup2, y: ySup2_px, x_offset_val_for_pos: ds_sup2 });
+        }
+
+        stressesToLabelConfig.forEach(item => {
+            if (item.rawVal === null || isNaN(item.rawVal) || Math.abs(item.displayVal) < 1e-3 ) {
+                 // Exceção: se o valor original for 0 (não null/NaN), mostre "0"
+                if (!(item.rawVal === 0 && !isNaN(item.rawVal))) return;
+            }
+
+            const tx = document.createElementNS(SVG_NS, 'text');
+            const xText = Xc + item.x_offset_val_for_pos * scale + (item.displayVal >= 0 ? 3 : -3);
+            
+            tx.setAttribute('x', Math.min(W - pad.right -1, Math.max(pad.left + 1, xText))); 
+            tx.setAttribute('y', item.y + (item.y === yInf_px ? -3 : (item.y === ySup2_px ? 10 : (item.y === ySup1_px && ySup1_px < yInf_px - 5 ? 3 : -3) ) ) ); 
+            tx.setAttribute('text-anchor', item.displayVal >= 0 ? 'start' : 'end');
+            tx.style.fontSize = '9px';
+            tx.style.fontFamily = 'monospace';
+            tx.textContent = formatNumber(item.displayVal, Math.abs(item.displayVal) < 1 && item.displayVal !== 0 ? 1 : 0, false, true);
+            svg.appendChild(tx);
+        });
+        return svg;
+    }
+    
+
+    // --- Função para gerar e exibir diagramas de superposição ---
+    function getCombinationDefinitions(inputs, eta) {
+        return [
+            { // 0: η ⋅ 1.1 ⋅ P1o + G1
+                components: [
+                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'η⋅1.1⋅N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: eta * 1.1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'η⋅1.1⋅M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: eta * 1.1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                ],
+                resultDiagramSectionHeightKey: 'inicial.h_total', resultStressFiberSupKey: 'sup1'
+            },
+            { // 1: 1.1 ⋅ (P1o + P2o) + G1
+                components: [
+                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: '1.1⋅N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1.1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: '1.1⋅M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1.1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    ...(inputs.num_cables2 > 0 ? [
+                        { title: '1.1⋅N<sub>P2o</sub>', stressKeyAx: 'p2o_ax', stressKeyFlex: null, multiplier: 1.1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                        { title: '1.1⋅M<sub>P2o</sub>', stressKeyAx: null, stressKeyFlex: 'p2o_flex', multiplier: 1.1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' }
+                    ] : []),
+                ],
+                resultDiagramSectionHeightKey: 'inicial.h_total', resultStressFiberSupKey: 'sup1'
+            },
+            { // 2: P1o + G1 + G2
+                components: [
+                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>g2</sub>', stressKeyAx: 'ng2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>g2</sub>', stressKeyAx: null, stressKeyFlex: 'mg2_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                ],
+                resultDiagramSectionHeightKey: 'inicial.h_total', resultStressFiberSupKey: 'sup1'
+            },
+            { // 3: G1+G2 + P1o+P2o --- RESULTADO NA SEÇÃO INICIAL ATÉ SUP1
+                components: [
+                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>g2</sub>', stressKeyAx: 'ng2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>g2</sub>', stressKeyAx: null, stressKeyFlex: 'mg2_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    ...(inputs.num_cables2 > 0 ? [
+                        { title: 'N<sub>P2o</sub>', stressKeyAx: 'p2o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                        { title: 'M<sub>P2o</sub>', stressKeyAx: null, stressKeyFlex: 'p2o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' }
+                    ] : []),
+                ],
+                resultDiagramSectionHeightKey: 'inicial.h_total', resultStressFiberSupKey: 'sup1' 
+            },
+            { // 4: ELS-F: P1o+ΔP1 + P2o+ΔP2 + G1+G2+G3 + ψ1⋅Q
+                components: [
+                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>g2</sub>', stressKeyAx: 'ng2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>g2</sub>', stressKeyAx: null, stressKeyFlex: 'mg2_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>g3</sub>', stressKeyAx: 'ng3_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    { title: 'M<sub>g3</sub>', stressKeyAx: null, stressKeyFlex: 'mg3_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    { title: 'N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>&Delta;P1</sub>', stressKeyAx: 'delta_p1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    { title: 'M<sub>&Delta;P1</sub>', stressKeyAx: null, stressKeyFlex: 'delta_p1_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    ...(inputs.num_cables2 > 0 ? [
+                        { title: 'N<sub>P2o</sub>', stressKeyAx: 'p2o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                        { title: 'M<sub>P2o</sub>', stressKeyAx: null, stressKeyFlex: 'p2o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                        { title: 'N<sub>&Delta;P2</sub>', stressKeyAx: 'delta_p2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                        { title: 'M<sub>&Delta;P2</sub>', stressKeyAx: null, stressKeyFlex: 'delta_p2_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' }
+                    ] : []),
+                    { title: 'N<sub>&psi;1Q</sub>', stressKeyAx: 'nq_ax', stressKeyFlex: null, multiplier: inputs.psi1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    { title: 'M<sub>&psi;1Q</sub>', stressKeyAx: null, stressKeyFlex: 'mq_flex', multiplier: inputs.psi1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                ],
+                resultDiagramSectionHeightKey: 'final.h_total', resultStressFiberSupKey: 'sup2'
+            },
+            { // 5: ELS-D: P1o+ΔP1 + P2o+ΔP2 + G1+G2+G3 + ψ2⋅Q
+                 components: [
+                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>g2</sub>', stressKeyAx: 'ng2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>g2</sub>', stressKeyAx: null, stressKeyFlex: 'mg2_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>g3</sub>', stressKeyAx: 'ng3_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    { title: 'M<sub>g3</sub>', stressKeyAx: null, stressKeyFlex: 'mg3_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    { title: 'N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>&Delta;P1</sub>', stressKeyAx: 'delta_p1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    { title: 'M<sub>&Delta;P1</sub>', stressKeyAx: null, stressKeyFlex: 'delta_p1_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    ...(inputs.num_cables2 > 0 ? [
+                        { title: 'N<sub>P2o</sub>', stressKeyAx: 'p2o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                        { title: 'M<sub>P2o</sub>', stressKeyAx: null, stressKeyFlex: 'p2o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                        { title: 'N<sub>&Delta;P2</sub>', stressKeyAx: 'delta_p2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                        { title: 'M<sub>&Delta;P2</sub>', stressKeyAx: null, stressKeyFlex: 'delta_p2_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' }
+                    ] : []),
+                    { title: 'N<sub>&psi;2Q</sub>', stressKeyAx: 'nq_ax', stressKeyFlex: null, multiplier: inputs.psi2, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    { title: 'M<sub>&psi;2Q</sub>', stressKeyAx: null, stressKeyFlex: 'mq_flex', multiplier: inputs.psi2, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                ],
+                resultDiagramSectionHeightKey: 'final.h_total', resultStressFiberSupKey: 'sup2'
+            }
+        ];
+    }
+
+
+    function generateAndDisplaySuperpositionDiagrams(combinationIndex, inputs, properties, indStressesToUse) {
+        const container = getElement('stress-superposition-diagrams-container');
+        container.innerHTML = '<p class="text-sm text-gray-500 italic">Gerando diagramas...</p>'; 
+
+        if (!inputs || !properties || !indStressesToUse) {
+            container.innerHTML = '<p class="text-sm text-red-500 italic">Dados insuficientes para gerar diagramas. Calcule as tensões primeiro.</p>';
+            return;
+        }
+        
+        const eta = inputs.ato_percentage / 100.0;
+        const allCombinationDefinitions = getCombinationDefinitions(inputs, eta);
+        
+        const selectedCombinationDef = allCombinationDefinitions[combinationIndex];
+        if (!selectedCombinationDef) {
+            container.innerHTML = '<p class="text-sm text-red-500 italic">Configuração para esta combinação não encontrada.</p>';
+            console.error("Diagram Error: Definição da combinação não encontrada para o índice:", combinationIndex);
+            return;
+        }
+
+        const comboResults_tfm2 = calculateCombinedStressesAndVerifications(inputs, [], indStressesToUse, properties); 
+        
+        if (!comboResults_tfm2 || !Array.isArray(comboResults_tfm2) || combinationIndex < 0 || combinationIndex >= comboResults_tfm2.length) {
+            container.innerHTML = '<p class="text-sm text-red-500 italic">Erro: Resultados da combinação calculada não encontrados ou inválidos.</p>';
+            console.error("Diagram Error: comboResults_tfm2 inválido ou combinationIndex fora dos limites.", {comboResults_tfm2, combinationIndex});
+            return;
+        }
+        const currentComboResult_tfm2 = comboResults_tfm2[combinationIndex];
+        if (typeof currentComboResult_tfm2 !== 'object' || currentComboResult_tfm2 === null) { 
+            container.innerHTML = '<p class="text-sm text-red-500 italic">Erro: Formato inesperado para os dados da combinação calculada.</p>';
+            console.error("Diagram Error: Formato inesperado para currentComboResult_tfm2.", currentComboResult_tfm2);
+            return;
+        }
+
+        let totalSigmaInf_tfm2_final = currentComboResult_tfm2.inf;
+        let totalSigmaSup_tfm2_final_for_diagram; 
+        let sectionHeightForResultDiagram_m;
+        let ySup1_forResultDiagram_m = properties.inicial.h_total; 
+
+        if (combinationIndex <= 2 || combinationIndex === 3) { 
+            totalSigmaSup_tfm2_final_for_diagram = currentComboResult_tfm2.actualSup1ForTable; 
+            sectionHeightForResultDiagram_m = properties.inicial.h_total;
+        } else { 
+            totalSigmaSup_tfm2_final_for_diagram = currentComboResult_tfm2.actualSup2ForTable;
+            sectionHeightForResultDiagram_m = properties.final.h_total;
+        }
+
+
+        let allStressValuesForSigmaRef_tfm2 = [];
+        selectedCombinationDef.components.forEach(comp => {
+            const stressDataAx = comp.stressKeyAx ? indStressesToUse[comp.stressKeyAx] : null; 
+            const stressDataFlex = comp.stressKeyFlex ? indStressesToUse[comp.stressKeyFlex] : null;
+            
+            let s_inf_knm2_comp = 0;
+            let s_sup1_knm2_comp = 0; 
+            let s_sup2_knm2_comp = 0;
+
+            if (stressDataAx) {
+                s_inf_knm2_comp += safeGet(stressDataAx, 'inf') * comp.multiplier;
+                s_sup1_knm2_comp += safeGet(stressDataAx, 'sup1') * comp.multiplier;
+                s_sup2_knm2_comp += safeGet(stressDataAx, 'sup2') * comp.multiplier;
+            }
+            if (stressDataFlex) {
+                s_inf_knm2_comp += safeGet(stressDataFlex, 'inf') * comp.multiplier;
+                s_sup1_knm2_comp += safeGet(stressDataFlex, 'sup1') * comp.multiplier;
+                s_sup2_knm2_comp += safeGet(stressDataFlex, 'sup2') * comp.multiplier;
+            }
+            
+            if (!isNaN(s_inf_knm2_comp)) allStressValuesForSigmaRef_tfm2.push(Math.abs(s_inf_knm2_comp * KN_M2_TO_TF_M2));
+            if (!isNaN(s_sup1_knm2_comp)) allStressValuesForSigmaRef_tfm2.push(Math.abs(s_sup1_knm2_comp * KN_M2_TO_TF_M2));
+            if (getPropertyByPath(properties, comp.diagramSectionHeightKey) > properties.inicial.h_total + 1e-3) { 
+                 if (!isNaN(s_sup2_knm2_comp)) allStressValuesForSigmaRef_tfm2.push(Math.abs(s_sup2_knm2_comp * KN_M2_TO_TF_M2));
+            }
+        });
+
+        if (totalSigmaInf_tfm2_final !== null && !isNaN(totalSigmaInf_tfm2_final)) allStressValuesForSigmaRef_tfm2.push(Math.abs(totalSigmaInf_tfm2_final));
+        if (currentComboResult_tfm2.actualSup1ForTable !== null && !isNaN(currentComboResult_tfm2.actualSup1ForTable)) { // Considera sup1 do resultado
+            allStressValuesForSigmaRef_tfm2.push(Math.abs(currentComboResult_tfm2.actualSup1ForTable));
+        }
+        if (currentComboResult_tfm2.actualSup2ForTable !== null && !isNaN(currentComboResult_tfm2.actualSup2ForTable)) { // Considera sup2 do resultado
+            allStressValuesForSigmaRef_tfm2.push(Math.abs(currentComboResult_tfm2.actualSup2ForTable));
+        }
+        
+        const sigmaRefForDisplay_tfm2 = allStressValuesForSigmaRef_tfm2.length > 0 
+                                      ? Math.max(...allStressValuesForSigmaRef_tfm2.filter(v => !isNaN(v) && v !== null && isFinite(v))) 
+                                      : 1.0; 
+        const effectiveSigmaRef_tfm2 = sigmaRefForDisplay_tfm2 < 1e-6 ? 1.0 : sigmaRefForDisplay_tfm2; 
+
+        container.innerHTML = ''; 
+
+        selectedCombinationDef.components.forEach((comp, index) => {
+            const stressDataAx = comp.stressKeyAx ? indStressesToUse[comp.stressKeyAx] : null;
+            const stressDataFlex = comp.stressKeyFlex ? indStressesToUse[comp.stressKeyFlex] : null;
+            
+            let s_inf_knm2_comp = 0;
+            let s_sup1_knm2_comp = 0; 
+            let s_sup2_knm2_comp = 0; 
+
+            if (stressDataAx) {
+                s_inf_knm2_comp += safeGet(stressDataAx, 'inf') * comp.multiplier;
+                s_sup1_knm2_comp += safeGet(stressDataAx, 'sup1') * comp.multiplier; 
+                s_sup2_knm2_comp += safeGet(stressDataAx, 'sup2') * comp.multiplier; 
+            }
+            if (stressDataFlex) {
+                s_inf_knm2_comp += safeGet(stressDataFlex, 'inf') * comp.multiplier;
+                s_sup1_knm2_comp += safeGet(stressDataFlex, 'sup1') * comp.multiplier;
+                s_sup2_knm2_comp += safeGet(stressDataFlex, 'sup2') * comp.multiplier;
+            }
+            
+            let currentComponentSectionHeight_m = getPropertyByPath(properties, comp.diagramSectionHeightKey);
+            
+            const sigmas_tfm2 = [
+                s_inf_knm2_comp * KN_M2_TO_TF_M2,
+                s_sup1_knm2_comp * KN_M2_TO_TF_M2,
+                s_sup2_knm2_comp * KN_M2_TO_TF_M2 
+            ];
+
+            const svg = drawStressDiagramEnhanced(
+                sigmas_tfm2,
+                properties.inicial.h_total, 
+                currentComponentSectionHeight_m, 
+                comp.title,
+                effectiveSigmaRef_tfm2
+            );
+            container.appendChild(svg);
+
+            if (index < selectedCombinationDef.components.length - 1) {
+                const plusSign = document.createElement('span');
+                plusSign.className = 'operator';
+                plusSign.textContent = '+';
+                container.appendChild(plusSign);
+            }
+        });
+
+        const equalsSign = document.createElement('span');
+        equalsSign.className = 'operator';
+        equalsSign.textContent = '=';
+        container.appendChild(equalsSign);
+
+        // Para o diagrama resultante final
+        const result_s_inf_tfm2 = currentComboResult_tfm2.inf;
+        const result_s_sup1_tfm2 = currentComboResult_tfm2.actualSup1ForTable;
+        let result_s_sup2_tfm2 = currentComboResult_tfm2.actualSup2ForTable;
+
+        const finalSigmas_tfm2 = [result_s_inf_tfm2, result_s_sup1_tfm2, result_s_sup2_tfm2];
+
+        const finalSvg = drawStressDiagramEnhanced(
+            finalSigmas_tfm2, 
+            ySup1_forResultDiagram_m, 
+            sectionHeightForResultDiagram_m, 
+            'Resultado',
+            effectiveSigmaRef_tfm2
+        );
+        container.appendChild(finalSvg);
+    }
+
+    function updateSuperpositionDisplay() {
+        const selectedIndex = parseInt(superpositionComboSelect.value);
+        if (window.currentInputs && window.currentProperties && window.currentIndStresses) {
+            generateAndDisplaySuperpositionDiagrams(selectedIndex, window.currentInputs, window.currentProperties, window.currentIndStresses);
+        } else {
+            const container = getElement('stress-superposition-diagrams-container');
+            container.innerHTML = '<p class="text-sm text-gray-500 italic">Calcule as tensões primeiro para gerar os diagramas de superposição.</p>';
+        }
+    }
+
+
     // --- Função Principal de Cálculo e Orquestração ---
     function performCalculations() {
         try {
             const inputs = getInputs(); 
-            window.currentInputs = inputs; // Torna 'inputs' acessível globalmente para calculateDecompressionMoments
+            window.currentInputs = inputs; 
 
             const properties = calculateGeometricProperties(inputs.geometry, inputs.bf1, inputs.hf1, inputs.bf2, inputs.hf2);
-            const limitStresses_tfm2 = calculateLimitStresses(inputs);
+            window.currentProperties = properties; 
+
+            const limitStresses_tfm2 = calculateLimitStresses(inputs); 
             
             const prestressForces_tf = calculatePrestressForces(inputs); 
             const prestressMoments_tfm = calculatePrestressMoments(inputs, properties); 
 
-            const localIndStresses = calculateIndividualStresses(inputs, properties); 
+            const localIndStresses_knm2 = calculateIndividualStresses(inputs, properties); 
             
-            const decompressionMoments_tfm = calculateDecompressionMoments(inputs, properties, localIndStresses); 
+            const decompressionMoments_tfm = calculateDecompressionMoments(inputs, properties, localIndStresses_knm2); 
             
-            const combinedStresses_tfm2 = calculateCombinedStressesAndVerifications(inputs, limitStresses_tfm2); 
+            const combinedStresses_tfm2 = calculateCombinedStressesAndVerifications(inputs, limitStresses_tfm2, localIndStresses_knm2, properties); 
 
-            populateUIWithResults(properties, limitStresses_tfm2, combinedStresses_tfm2, localIndStresses, prestressMoments_tfm, prestressForces_tf, decompressionMoments_tfm);
+            populateUIWithResults(properties, limitStresses_tfm2, combinedStresses_tfm2, localIndStresses_knm2, prestressMoments_tfm, prestressForces_tf, decompressionMoments_tfm, inputs); // Passa inputs
             
             drawSection(); 
             resultsSection.classList.remove('hidden');
             resultsSection.scrollIntoView({ behavior: 'smooth' });
 
         } catch (error) {
-            console.error("Erro nos cálculos:", error, error.stack);
-            resultsSection.classList.add('hidden');
-            visualizationDiv.innerHTML = '<span class="text-sm italic text-red-600">Erro ao calcular. Verifique console.</span>';
-            const errorBox = document.createElement('div');
-            errorBox.style.cssText = 'position:fixed; left:50%; top:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid red; border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.1); z-index:1000; max-width: 90%; text-align: left;';
-            errorBox.innerHTML = `<p style="color: red; font-weight: bold; margin-bottom: 10px;">Erro nos Cálculos</p>
-                                <p>Ocorreu um erro durante o processamento. Verifique se todos os dados de entrada estão corretos e tente novamente. Para mais detalhes, verifique o console do navegador (geralmente acessível com F12).</p>
-                                <p style="font-size:0.8em; margin-top:5px; color: #555;">Detalhe técnico: ${error.message}</p>
-                                <button onclick="this.parentElement.remove()" style="margin-top: 15px; padding: 8px 16px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; display: block; margin-left: auto; margin-right: auto;">Fechar</button>`;
-            document.body.appendChild(errorBox);
+            console.error("Erro nos cálculos:", error, error.stack); 
+            resultsSection.classList.add('hidden'); 
+            const diagramContainer = getElement('stress-superposition-diagrams-container');
+            if (diagramContainer) { 
+                diagramContainer.innerHTML = `<p class="text-sm text-red-600 italic">Erro ao calcular. Verifique o console para detalhes: ${error.message}</p>`;
+            }
+            if (visualizationDiv) { 
+                 visualizationDiv.innerHTML = '<span class="text-sm italic text-red-600">Erro ao calcular. Verifique console.</span>';
+            }
         }
     }
 
@@ -1064,12 +1565,14 @@
         calculateBtn = getElement('calculate-btn');
         resultsSection = getElement('results-section');
         visualizationDiv = getElement('section-visualization');
-        tabButtons = querySelectorAll('.tab-button');
+        
+        tabButtons = [getElement('tab-btn-geometria'), getElement('tab-btn-materiais'), getElement('tab-btn-acoes')];
         stepContents = [getElement('tab-content-geometria'), getElement('tab-content-materiais'), getElement('tab-content-acoes')];
         prevBtn = getElement('prev-btn');
         nextBtn = getElement('next-btn');
+        superpositionComboSelect = getElement('stress-superposition-combo-select');
 
-        geometryTbody.innerHTML = '';
+        geometryTbody.innerHTML = ''; 
         addGeometryRow(0.780, 0.780, 0.350); addGeometryRow(0.780, 0.220, 0.280);
         addGeometryRow(0.220, 0.220, 1.620); addGeometryRow(0.220, 1.300, 0.030);
         addGeometryRow(1.300, 1.300, 0.120);
@@ -1092,6 +1595,15 @@
         addRowBtn.addEventListener('click', () => { addGeometryRow(); updatePrestressForcesAndMomentsInActionsUI(); drawSection(); });
         removeRowBtn.addEventListener('click', removeGeometryRow); 
         calculateBtn.addEventListener('click', performCalculations);
+        
+        getElement('tab-btn-geometria').addEventListener('click', () => changeTab('geometria'));
+        getElement('tab-btn-materiais').addEventListener('click', () => changeTab('materiais'));
+        getElement('tab-btn-acoes').addEventListener('click', () => changeTab('acoes'));
+        
+        prevBtn.addEventListener('click', () => changeStep(-1));
+        nextBtn.addEventListener('click', () => changeStep(1));
+
+        superpositionComboSelect.addEventListener('change', updateSuperpositionDisplay);
 
         const inputsForDynamicUpdate = document.querySelectorAll('.prestress-input, #bf1, #hf1, #bf2, #hf2');
         inputsForDynamicUpdate.forEach(input => {
@@ -1110,3 +1622,4 @@
 </script>
 </body>
 </html>
+
