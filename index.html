@@ -3,66 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora ELS - Elemento Protendido</title>
+    <title>Calculadora ELS - Elemento Protendido (Refatorada)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Estilos gerais e de input */
         body { font-family: 'Inter', sans-serif; @apply bg-gray-50; }
         input[type=number] { -moz-appearance: textfield; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .input-label { @apply block text-sm font-medium text-gray-700 mb-1; }
-        .input-field { @apply block w-full min-w-[5rem] px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-gray-400; }
-        .input-field-calculated { @apply block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm sm:text-sm text-gray-600; }
+        
+        .input-label { /* Estilo para labels que ficam ACIMA do input */
+            @apply block text-sm font-medium text-gray-700 mb-1; 
+        }
+        .input-label-horizontal { /* Para labels AO LADO do input */
+            @apply text-sm font-medium text-gray-700 whitespace-nowrap; 
+        }
+
+        .input-field { 
+            @apply block w-full min-w-[5rem] px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-gray-400; 
+        }
+        .input-field-calculated { 
+            @apply block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm sm:text-sm text-gray-600; 
+        }
+        
         /* Estilos de tabela */
         .table-sticky-header th { @apply sticky top-0 z-10; }
         .table-header { @apply px-4 py-2 bg-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300; }
         .table-cell { @apply px-4 py-2 whitespace-nowrap text-sm text-gray-800 border-b border-gray-200; }
         .table-cell-input { @apply w-full min-w-[4rem] px-1 py-0.5 bg-gray-50 border border-transparent focus:bg-white focus:border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500 text-right; }
         .table-cell-output { @apply w-full px-1 py-0.5 bg-white text-right; }
-        /* Estilos de verificação (Cores definidas diretamente) */
-        .verification-ok { color: #16a34a; font-weight: 600; } /* Verde */
-        .verification-fail { color: #dc2626; font-weight: 600; } /* Vermelho */
+        
+        /* Estilos de verificação */
+        .verification-ok { color: #16a34a; font-weight: 600; }
+        .verification-fail { color: #dc2626; font-weight: 600; }
         .results-table td, .results-table th { @apply border border-gray-200; }
+        
         /* Estilos de seção e visualização */
         .section-title { @apply text-lg font-semibold text-gray-800 mb-4 border-b border-gray-300 pb-2; }
         .subsection-title { @apply text-md font-medium text-gray-700 mb-3; }
         #section-visualization-container { @apply w-full aspect-square bg-gray-100 border border-gray-300 rounded-md mb-6 overflow-hidden relative; }
         #section-visualization { @apply w-full h-full flex items-center justify-center text-gray-500; }
         .element-number { font-size: 12px; font-weight: bold; font-family: monospace; fill: #4b5563; text-anchor: start; dominant-baseline: middle; }
-        .cg-label { font-size: 20px; font-family: monospace; }
+        .cg-label { font-size: 10px; font-family: monospace; }
         .dimension-line { stroke: #9ca3af; stroke-width: 1; stroke-dasharray: 2,2; }
         .dimension-text { font-size: 10px; fill: #6b7280; text-anchor: middle; }
+        
         /* Estilos para Abas */
         .tab-button { @apply px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 transition duration-150 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500; }
         .tab-button-active { @apply border-indigo-500 text-indigo-600 bg-white; }
         .tab-button-inactive { @apply border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300; }
         .tab-content { @apply p-6 bg-white border border-t-0 border-gray-200 rounded-b-lg; }
+        
         /* Estilos Botões Navegação */
         .nav-buttons { @apply flex justify-between mt-6; }
         .nav-button { @apply px-6 py-2 rounded-md text-sm font-medium shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed; }
         .nav-button-primary { @apply bg-indigo-600 text-white hover:bg-indigo-700; }
         .nav-button-secondary { @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50; }
+        
         /* Card Style */
         .card { @apply bg-white p-4 rounded-xl shadow border border-gray-300; }
+        
         /* Observações */
         .observations { @apply bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-lg text-sm space-y-2 leading-5; }
+        
         /* Botões +/- */
         .add-remove-button { @apply w-9 h-9 flex items-center justify-center bg-white text-gray-600 border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1; }
-        /* Classe para grids onde label fica acima */
-        .input-grid-vertical > div { @apply mb-4; }
+        
         /* Estilo para subscrito menor */
-        .results-table sub { font-size: 0.75em; vertical-align: sub; }
+        .results-table sub, .input-label sub, .input-label-horizontal sub, #tab-content-acoes sub { font-size: 0.75em; vertical-align: sub; }
+        
         /* Footer para Créditos */
         .app-footer { @apply mt-8 pt-4 border-t border-gray-200 text-left; }
-
     </style>
-     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-gray-100 p-4 md:p-8">
     <div class="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow-xl border border-gray-200">
-
         <header class="text-center mb-8">
             <h1 class="text-2xl font-bold tracking-tight text-gray-900">Calculadora de Tensões em Serviço (ELS)</h1>
             <p class="text-base text-gray-600">Elemento Estrutural Protendido</p>
@@ -104,32 +121,30 @@
                             </button>
                         </div>
                         <h3 class="subsection-title mt-6">1.2 Laje/Capa (Composta)</h3>
-                        <!-- Removida a classe input-grid-vertical e ajustado o layout dos itens internos -->
                         <div class="space-y-4 bg-gray-50 p-4 rounded-lg border">
                             <div>
                                 <p class="text-sm font-medium text-gray-600 mb-2">Laje Pré (1ª Camada):</p>
-                                <!-- Aplicado grid com 2 colunas apenas para os inputs, e flex para label/input -->
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                        <label for="bf1" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">Largura (b<sub>f1</sub>) (m)</label>
-                                        <input type="number" id="bf1" name="bf1" step="0.01" class="input-field sm:!w-auto sm:flex-grow" value="1.00" placeholder="m">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                    <div class="flex items-center gap-[1ch]">
+                                        <label for="bf1" class="input-label-horizontal">Largura (b<sub>f1</sub>) (m)</label>
+                                        <input type="number" id="bf1" name="bf1" step="0.01" class="input-field flex-grow" value="1.00" placeholder="m" min="0">
                                     </div>
-                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                        <label for="hf1" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">Altura (h<sub>f1</sub>) (m)</label>
-                                        <input type="number" id="hf1" name="hf1" step="0.01" class="input-field sm:!w-auto sm:flex-grow" value="0.11" placeholder="m">
+                                    <div class="flex items-center gap-[1ch]">
+                                        <label for="hf1" class="input-label-horizontal">Altura (h<sub>f1</sub>) (m)</label>
+                                        <input type="number" id="hf1" name="hf1" step="0.01" class="input-field flex-grow" value="0.11" placeholder="m" min="0">
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <p class="text-sm font-medium text-gray-600 mt-2 mb-2">Capa Conc. (2ª Camada):</p>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                        <label for="bf2" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">Largura (b<sub>f2</sub>) (m)</label>
-                                        <input type="number" id="bf2" name="bf2" step="0.001" class="input-field sm:!w-auto sm:flex-grow" value="3.455" placeholder="m">
+                                <p class="text-sm font-medium text-gray-600 mt-4 mb-2">Capa Conc. (2ª Camada):</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                    <div class="flex items-center gap-[1ch]">
+                                        <label for="bf2" class="input-label-horizontal">Largura (b<sub>f2</sub>) (m)</label>
+                                        <input type="number" id="bf2" name="bf2" step="0.001" class="input-field flex-grow" value="4.250" placeholder="m" min="0">
                                     </div>
-                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                        <label for="hf2" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">Altura (h<sub>f2</sub>) (m)</label>
-                                        <input type="number" id="hf2" name="hf2" step="0.01" class="input-field sm:!w-auto sm:flex-grow" value="0.14" placeholder="m">
+                                    <div class="flex items-center gap-[1ch]">
+                                        <label for="hf2" class="input-label-horizontal">Altura (h<sub>f2</sub>) (m)</label>
+                                        <input type="number" id="hf2" name="hf2" step="0.01" class="input-field flex-grow" value="0.14" placeholder="m" min="0">
                                     </div>
                                 </div>
                             </div>
@@ -138,84 +153,32 @@
 
                     <div id="tab-content-materiais" class="tab-content hidden">
                         <h3 class="subsection-title">2.1 Concreto</h3>
-                        <p class="text-xs text-gray-500 mb-3">O campo "f<sub>ck,j</sub> (Interm.)" refere-se à resistência do concreto no estágio de aplicação de G2 e P2.</p>
-                        <!-- Restaurada a classe input-grid-vertical e removidas as classes flex dos itens internos -->
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 gap-y-4 mb-6 bg-gray-50 p-4 rounded-lg border input-grid-vertical">
-                            <div>
-                                <label for="fckj_ato" class="input-label">f<sub>ck,j</sub> (ATO) (tf/m²)</label>
-                                <input type="number" id="fckj_ato" name="fckj_ato" step="10" class="input-field" value="3500" placeholder="tf/m²">
-                            </div>
-                            <div>
-                                <label for="fckj_servico" class="input-label">f<sub>ck,j</sub> (Interm.) (tf/m²)</label>
-                                <input type="number" id="fckj_servico" name="fckj_servico" step="10" class="input-field" value="3500" placeholder="tf/m²">
-                            </div>
-                            <div>
-                                <label for="fck28" class="input-label">f<sub>ck</sub> (28d) (tf/m²)</label>
-                                <input type="number" id="fck28" name="fck28" step="10" class="input-field" value="4500" placeholder="tf/m²">
-                            </div>
-                            <div>
-                                <label for="alpha" class="input-label">α (Alfa)</label>
-                                <input type="number" id="alpha" name="alpha" step="0.1" class="input-field" value="1.2" placeholder="1.0, 1.2 ou 1.5">
-                                <!-- A nota sobre alpha será colocada abaixo do grid para melhor visualização -->
-                            </div>
-                            <!-- Nota sobre Alpha - posicionada para ocupar a largura total abaixo dos campos -->
-                            <div class="md:col-span-4 mt-1"> <!-- mt-1 para um pequeno espaçamento superior -->
-                                <p class="text-xs text-gray-500">
-                                    Nota sobre α: Conforme NBR6118, α depende da relação b/b<sub>p</sub>.
-                                    <br class="sm:hidden"> <!-- Quebra de linha em telas pequenas -->
-                                    1.5 (para b/b<sub>p</sub> ≤5), 1.2 (para 5 < b/b<sub>p</sub> < 8), 1.0 (para b/b<sub>p</sub> ≥8).
-                                </p>
-                            </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-4 mb-6 bg-gray-50 p-4 rounded-lg border">
+                            <div><label for="fckj_ato" class="input-label">f<sub>ck,j</sub> (ATO) (tf/m²)</label><input type="number" id="fckj_ato" name="fckj_ato" step="10" class="input-field" value="3500" placeholder="tf/m²"></div>
+                            <div><label for="fckj_servico" class="input-label">f<sub>ck,j</sub> (Serviço) (tf/m²)</label><input type="number" id="fckj_servico" name="fckj_servico" step="10" class="input-field" value="3500" placeholder="tf/m²"></div>
+                            <div><label for="fck28" class="input-label">f<sub>ck</sub> (28d) (tf/m²)</label><input type="number" id="fck28" name="fck28" step="10" class="input-field" value="4500" placeholder="tf/m²"></div>
+                            <div><label for="alpha" class="input-label">α (Alfa)</label><input type="number" id="alpha" name="alpha" step="0.1" class="input-field" value="1.2" placeholder="1.0, 1.2 ou 1.5"></div>
                         </div>
-
                         <h3 class="subsection-title">2.2 Protensão</h3>
-                        <p class="text-xs text-gray-500 mb-3">P<sub>0</sub>: Força de protensão característica após perdas imediatas. P<sub>∞</sub>: Força de protensão após todas as perdas.</p>
                         <div class="space-y-6 bg-gray-50 p-4 rounded-lg border">
                             <div>
                                 <p class="text-md font-medium text-gray-700 mb-3">Protensão - Etapa 1:</p>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                        <label for="cg_cables1" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">CG Cabos (m)</label>
-                                        <input type="number" id="cg_cables1" name="cg_cables1" step="0.001" class="input-field prestress-input sm:!w-auto sm:flex-grow" value="0.209" placeholder="m">
-                                    </div>
-                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                        <label for="num_cables1" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">Nº Cabos (unid.)</label>
-                                        <input type="number" id="num_cables1" name="num_cables1" step="1" class="input-field prestress-input sm:!w-auto sm:flex-grow" value="46" placeholder="unid.">
-                                    </div>
-                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                        <label for="po1" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">P₀ (tf/cabo)</label>
-                                        <input type="number" id="po1" name="po1" step="0.1" class="input-field prestress-input sm:!w-auto sm:flex-grow" value="21.1" placeholder="tf/cabo">
-                                    </div>
-                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                        <label for="pinf1" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">P<sub class="text-xs">∞</sub> (tf/cabo)</label>
-                                        <input type="number" id="pinf1" name="pinf1" step="0.1" class="input-field prestress-input sm:!w-auto sm:flex-grow" value="17.8" placeholder="tf/cabo">
-                                    </div>
-                                    <div class="sm:col-span-2 flex flex-col sm:flex-row sm:items-baseline">
-                                        <label for="ato_percentage" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">% P₀ (ATO) (%)</label>
-                                        <input type="number" id="ato_percentage" name="ato_percentage" step="1" min="0" max="100" class="input-field sm:!w-auto sm:flex-grow" value="100" placeholder="%">
-                                    </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                    <div class="flex items-center gap-[1ch]"><label for="cg_cables1" class="input-label-horizontal">CG Cabos (m)</label><input type="number" id="cg_cables1" name="cg_cables1" step="0.001" class="input-field prestress-input flex-grow" value="0.209" placeholder="m"></div>
+                                    <div class="flex items-center gap-[1ch]"><label for="num_cables1" class="input-label-horizontal">Nº Cabos (unid.)</label><input type="number" id="num_cables1" name="num_cables1" step="1" class="input-field prestress-input flex-grow" value="46" placeholder="unid."></div>
+                                    <div class="flex items-center gap-[1ch]"><label for="po1" class="input-label-horizontal">P<sub>o</sub> (tf/cabo)</label><input type="number" id="po1" name="po1" step="0.1" class="input-field prestress-input flex-grow" value="21.1" placeholder="tf/cabo"></div>
+                                    <div class="flex items-center gap-[1ch]"><label for="pinf1" class="input-label-horizontal">P<sub>∞</sub> (tf/cabo)</label><input type="number" id="pinf1" name="pinf1" step="0.1" class="input-field prestress-input flex-grow" value="17.8" placeholder="tf/cabo"></div>
+                                    <div class="sm:col-span-2 flex items-center gap-[1ch]"><label for="ato_percentage" class="input-label-horizontal">% P<sub>o</sub> (ATO) (%)</label><input type="number" id="ato_percentage" name="ato_percentage" step="1" min="0" max="100" class="input-field flex-grow" value="100" placeholder="%"></div>
                                 </div>
                             </div>
                             <hr class="border-gray-200">
                             <div>
                                 <p class="text-md font-medium text-gray-700 mb-3">Protensão - Etapa 2:</p>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                        <label for="cg_cables2" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">CG Cabos (m)</label>
-                                        <input type="number" id="cg_cables2" name="cg_cables2" step="0.001" class="input-field prestress-input sm:!w-auto sm:flex-grow" value="0.0" placeholder="m">
-                                    </div>
-                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                        <label for="num_cables2" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">Nº Cabos (unid.)</label>
-                                        <input type="number" id="num_cables2" name="num_cables2" step="1" class="input-field prestress-input sm:!w-auto sm:flex-grow" value="0" placeholder="unid.">
-                                    </div>
-                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                        <label for="po2" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">P₀ (tf/cabo)</label>
-                                        <input type="number" id="po2" name="po2" step="0.1" class="input-field prestress-input sm:!w-auto sm:flex-grow" value="0.0" placeholder="tf/cabo">
-                                    </div>
-                                    <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                        <label for="pinf2" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">P<sub class="text-xs">∞</sub> (tf/cabo)</label>
-                                        <input type="number" id="pinf2" name="pinf2" step="0.1" class="input-field prestress-input sm:!w-auto sm:flex-grow" value="0.0" placeholder="tf/cabo">
-                                    </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                    <div class="flex items-center gap-[1ch]"><label for="cg_cables2" class="input-label-horizontal">CG Cabos (m)</label><input type="number" id="cg_cables2" name="cg_cables2" step="0.001" class="input-field prestress-input flex-grow" value="0.0" placeholder="m"></div>
+                                    <div class="flex items-center gap-[1ch]"><label for="num_cables2" class="input-label-horizontal">Nº Cabos (unid.)</label><input type="number" id="num_cables2" name="num_cables2" step="1" class="input-field prestress-input flex-grow" value="0" placeholder="unid."></div>
+                                    <div class="flex items-center gap-[1ch]"><label for="po2" class="input-label-horizontal">P<sub>o</sub> (tf/cabo)</label><input type="number" id="po2" name="po2" step="0.1" class="input-field prestress-input flex-grow" value="0.0" placeholder="tf/cabo"></div>
+                                    <div class="flex items-center gap-[1ch]"><label for="pinf2" class="input-label-horizontal">P<sub>∞</sub> (tf/cabo)</label><input type="number" id="pinf2" name="pinf2" step="0.1" class="input-field prestress-input flex-grow" value="0.0" placeholder="tf/cabo"></div>
                                 </div>
                             </div>
                         </div>
@@ -223,137 +186,74 @@
 
                     <div id="tab-content-acoes" class="tab-content hidden">
                         <h3 class="subsection-title">3.1 Momentos Solicitantes (tf.m)</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 bg-gray-50 p-4 rounded-lg border mb-6 input-grid-vertical">
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="mg1" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">M<sub>g1</sub></label>
-                                <input type="number" id="mg1" name="mg1" step="0.1" class="input-field sm:!w-auto sm:flex-grow" value="377.0">
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="mg2" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">M<sub>g2</sub></label>
-                                <input type="number" id="mg2" name="mg2" step="0.1" class="input-field sm:!w-auto sm:flex-grow" value="346.0">
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="mg3" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">M<sub>g3</sub></label>
-                                <input type="number" id="mg3" name="mg3" step="0.1" class="input-field sm:!w-auto sm:flex-grow" value="262.0">
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="mq" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">M<sub>q</sub></label>
-                                <input type="number" id="mq" name="mq" step="0.1" class="input-field sm:!w-auto sm:flex-grow" value="537.0">
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="mp1o" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">M<sub>p1o</sub> (calc.)</label>
-                                <input type="number" id="mp1o" class="input-field-calculated sm:!w-auto sm:flex-grow" readonly>
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="mp2o" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">M<sub>p2o</sub> (calc.)</label>
-                                <input type="number" id="mp2o" class="input-field-calculated sm:!w-auto sm:flex-grow" readonly>
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="mp1oo" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">M<sub>p1<sub class="text-xs">∞</sub></sub> (calc.)</label>
-                                <input type="number" id="mp1oo" class="input-field-calculated sm:!w-auto sm:flex-grow" readonly>
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="mp2oo" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">M<sub>p2<sub class="text-xs">∞</sub></sub> (calc.)</label>
-                                <input type="number" id="mp2oo" class="input-field-calculated sm:!w-auto sm:flex-grow" readonly>
-                            </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 bg-gray-50 p-4 rounded-lg border mb-6">
+                            <div class="flex items-center gap-[1ch]"><label for="mg1" class="input-label-horizontal">M<sub>g1</sub></label><input type="number" id="mg1" name="mg1" step="0.1" class="input-field flex-grow" value="377.0"></div>
+                            <div class="flex items-center gap-[1ch]"><label for="mg2" class="input-label-horizontal">M<sub>g2</sub></label><input type="number" id="mg2" name="mg2" step="0.1" class="input-field flex-grow" value="412.0"></div>
+                            <div class="flex items-center gap-[1ch]"><label for="mg3" class="input-label-horizontal">M<sub>g3</sub></label><input type="number" id="mg3" name="mg3" step="0.1" class="input-field flex-grow" value="203.0"></div>
+                            <div class="flex items-center gap-[1ch]"><label for="mq" class="input-label-horizontal">M<sub>q</sub></label><input type="number" id="mq" name="mq" step="0.1" class="input-field flex-grow" value="557.0"></div>
+                            <div class="flex items-center gap-[1ch]"><label for="mp1o" class="input-label-horizontal">M<sub>p1o</sub> (calc.)</label><input type="number" id="mp1o" class="input-field-calculated flex-grow" readonly></div>
+                            <div class="flex items-center gap-[1ch]"><label for="mp2o" class="input-label-horizontal">M<sub>p2o</sub> (calc.)</label><input type="number" id="mp2o" class="input-field-calculated flex-grow" readonly></div>
+                            <div class="flex items-center gap-[1ch]"><label for="mp1oo" class="input-label-horizontal">M<sub>p1∞</sub> (calc.)</label><input type="number" id="mp1oo" class="input-field-calculated flex-grow" readonly></div>
+                            <div class="flex items-center gap-[1ch]"><label for="mp2oo" class="input-label-horizontal">M<sub>p2∞</sub> (calc.)</label><input type="number" id="mp2oo" class="input-field-calculated flex-grow" readonly></div>
                         </div>
 
                         <h3 class="subsection-title">3.2 Esforços Normais Solicitantes (tf)</h3>
                         <p class="text-xs text-gray-500 mb-3">Informe os esforços normais externos (Compressão negativa, Tração positiva).</p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 bg-gray-50 p-4 rounded-lg border mb-6 input-grid-vertical">
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="ng1" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">N<sub>g1</sub></label>
-                                <input type="number" id="ng1" name="ng1" step="0.1" class="input-field sm:!w-auto sm:flex-grow" value="0.0" placeholder="tf">
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="ng2" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">N<sub>g2</sub></label>
-                                <input type="number" id="ng2" name="ng2" step="0.1" class="input-field sm:!w-auto sm:flex-grow" value="0.0" placeholder="tf">
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="ng3" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">N<sub>g3</sub></label>
-                                <input type="number" id="ng3" name="ng3" step="0.1" class="input-field sm:!w-auto sm:flex-grow" value="0.0" placeholder="tf">
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="nq" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">N<sub>q</sub></label>
-                                <input type="number" id="nq" name="nq" step="0.1" class="input-field sm:!w-auto sm:flex-grow" value="0.0" placeholder="tf">
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="np1o" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">N<sub>p1o</sub> (calc.)</label>
-                                <input type="number" id="np1o" class="input-field-calculated sm:!w-auto sm:flex-grow" readonly>
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="np2o" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">N<sub>p2o</sub> (calc.)</label>
-                                <input type="number" id="np2o" class="input-field-calculated sm:!w-auto sm:flex-grow" readonly>
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="np1oo" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">N<sub>p1<sub class="text-xs">∞</sub></sub> (calc.)</label>
-                                <input type="number" id="np1oo" class="input-field-calculated sm:!w-auto sm:flex-grow" readonly>
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="np2oo" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">N<sub>p2<sub class="text-xs">∞</sub></sub> (calc.)</label>
-                                <input type="number" id="np2oo" class="input-field-calculated sm:!w-auto sm:flex-grow" readonly>
-                            </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 bg-gray-50 p-4 rounded-lg border mb-6">
+                            <div class="flex items-center gap-[1ch]"><label for="ng1" class="input-label-horizontal">N<sub>g1</sub></label><input type="number" id="ng1" name="ng1" step="0.1" class="input-field flex-grow" value="0.0" placeholder="tf"></div>
+                            <div class="flex items-center gap-[1ch]"><label for="ng2" class="input-label-horizontal">N<sub>g2</sub></label><input type="number" id="ng2" name="ng2" step="0.1" class="input-field flex-grow" value="0.0" placeholder="tf"></div>
+                            <div class="flex items-center gap-[1ch]"><label for="ng3" class="input-label-horizontal">N<sub>g3</sub></label><input type="number" id="ng3" name="ng3" step="0.1" class="input-field flex-grow" value="0.0" placeholder="tf"></div>
+                            <div class="flex items-center gap-[1ch]"><label for="nq" class="input-label-horizontal">N<sub>q</sub></label><input type="number" id="nq" name="nq" step="0.1" class="input-field flex-grow" value="0.0" placeholder="tf"></div>
+                            <div class="flex items-center gap-[1ch]"><label for="np1o" class="input-label-horizontal">N<sub>p1o</sub> (calc.)</label><input type="number" id="np1o" class="input-field-calculated flex-grow" readonly></div>
+                            <div class="flex items-center gap-[1ch]"><label for="np2o" class="input-label-horizontal">N<sub>p2o</sub> (calc.)</label><input type="number" id="np2o" class="input-field-calculated flex-grow" readonly></div>
+                            <div class="flex items-center gap-[1ch]"><label for="np1oo" class="input-label-horizontal">N<sub>p1∞</sub> (calc.)</label><input type="number" id="np1oo" class="input-field-calculated flex-grow" readonly></div>
+                            <div class="flex items-center gap-[1ch]"><label for="np2oo" class="input-label-horizontal">N<sub>p2∞</sub> (calc.)</label><input type="number" id="np2oo" class="input-field-calculated flex-grow" readonly></div>
                         </div>
-
                         <h3 class="subsection-title">3.3 Coeficientes (ψ)</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 bg-gray-50 p-4 rounded-lg border input-grid-vertical">
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="psi1" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">ψ<sub class="text-xs">1</sub></label>
-                                <input type="number" id="psi1" name="psi1" step="0.01" class="input-field sm:!w-auto sm:flex-grow" value="0.50">
-                            </div>
-                            <div class="flex flex-col sm:flex-row sm:items-baseline">
-                                <label for="psi2" class="input-label sm:!mb-0 sm:mr-2 whitespace-nowrap">ψ<sub class="text-xs">2</sub></label>
-                                <input type="number" id="psi2" name="psi2" step="0.01" class="input-field sm:!w-auto sm:flex-grow" value="0.30">
-                            </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 bg-gray-50 p-4 rounded-lg border">
+                            <div class="flex items-center gap-[1ch]"><label for="psi1" class="input-label-horizontal">ψ<sub>1</sub></label><input type="number" id="psi1" name="psi1" step="0.01" class="input-field flex-grow" value="0.50"></div>
+                            <div class="flex items-center gap-[1ch]"><label for="psi2" class="input-label-horizontal">ψ<sub>2</sub></label><input type="number" id="psi2" name="psi2" step="0.01" class="input-field flex-grow" value="0.30"></div>
                         </div>
                     </div>
+                </div>
 
-                 <div class="nav-buttons">
+                <div class="nav-buttons">
                     <button id="prev-btn" type="button" class="nav-button nav-button-secondary" onclick="changeStep(-1)" disabled>‹ Voltar</button>
                     <button id="next-btn" type="button" class="nav-button nav-button-primary" onclick="changeStep(1)">Próximo ›</button>
-                 </div>
-
+                </div>
                 <footer class="app-footer">
                     <p class="text-sm text-gray-500">Desenvolvido por: Leandro Hildinger Cavalcanti</p>
-                    <!-- A linha abaixo foi removida -->
-                    <!-- <p class="text-xs text-gray-500">Lógica de cálculo aprimorada com sugestões de IA.</p> -->
                     <p class="text-sm mt-2">
-                        <a href="/Calculadora-ELS-Protensao/manual" target="_blank" class="text-indigo-600 hover:underline">Ver Manual de Uso</a>
+                        <a href="manual.md" target="_blank" class="text-indigo-600 hover:underline">Ver Manual de Uso</a>
                     </p>
-                 </footer>
-
+                </footer>
             </section>
 
             <aside class="lg:col-span-1">
-                 <h2 class="section-title">Visualização da Seção</h2>
-                 <div id="section-visualization-container"> <div id="section-visualization">
-                        <span class="text-sm italic">Visualização da seção aparecerá aqui</span>
-                    </div>
-                 </div>
-
-
-                 <h2 class="section-title">Observações</h2>
-                 <div class="observations bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-lg text-sm space-y-2 leading-5">
-                     <p><strong>a)</strong> Os elementos da viga são inseridos de baixo para cima.</p>
-                     <p><strong>b)</strong> A protensão P2 (P<sub>0,2</sub>) é considerada aplicada sobre a seção inicial (sem lajes), após o carregamento G2.</p>
-                     <p><strong>c)</strong> Critério de tensões segue NBR 6118:2023 - Item 17.2.4.3.2 (a).</p>
-                     <p><strong>d)</strong> A verificação 0 (ATO) considera a porcentagem de P₀ definida.</p>
-                     <p><strong>e)</strong> Tensão limite de tração para ELS Frequente: f<sub>ctk,inf</sub>.</p>
-                     <p><strong>f)</strong> Tensão limite de tração para Comb. Intermediárias (2,3): α * f<sub>ctm,j</sub> (concreto na idade).</p>
-                     <p><strong>Convenção:</strong> Compressão (-), Tração (+).</p>
-                 </div>
-
-                 <div class="mt-8 flex justify-center lg:justify-start">
-                     <button id="calculate-btn" class="w-full lg:w-auto px-8 py-3 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-150 ease-in-out">
-                         Calcular Tensões
-                     </button>
-                 </div>
+                <h2 class="section-title">Visualização da Seção</h2>
+                <div id="section-visualization-container"> <div id="section-visualization">
+                    <span class="text-sm italic">Visualização da seção aparecerá aqui</span>
+                </div>
+                </div>
+                <h2 class="section-title">Observações</h2>
+                <div class="observations">
+                    <p><strong>a)</strong> Os elementos da viga são inseridos de baixo para cima.</p>
+                    <p><strong>b)</strong> A protensão 2 é introduzida após o carregamento G2.</p>
+                    <p><strong>c)</strong> Critério de tensões segue NBR 6118:2023 - Item 17.2.4.3.2 (a).</p>
+                    <p><strong>d)</strong> A verificação 0 (ATO) considera a porcentagem de P<sub>o</sub> definida acima.</p>
+                    <p><strong>Convenção:</strong> Compressão (-), Tração (+).</p>
+                </div>
+                <div class="mt-8 flex justify-center lg:justify-start">
+                    <button id="calculate-btn" class="w-full lg:w-auto px-8 py-3 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-150 ease-in-out">
+                        Calcular Tensões
+                    </button>
+                </div>
             </aside>
         </div>
 
         <section id="results-section" class="mt-10 pt-6 border-t border-gray-300 hidden">
-             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Resultados</h2>
-             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Resultados</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="card"> <h3 class="text-lg font-semibold text-gray-700 mb-3">Propriedades Geométricas</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full results-table">
@@ -380,26 +280,26 @@
                 </div>
 
                 <div class="card"> <h3 class="text-lg font-semibold text-gray-700 mb-3">Tensões Individuais por Ação (tf/m²)</h3>
-                  <div class="overflow-x-auto">
-                      <table class="min-w-full results-table">
-                         <thead>
-                              <tr>
-                                  <th class="table-header">Ação</th>
-                                  <th class="table-header">σ<sub>inf</sub></th>
-                                  <th class="table-header">σ<sub>sup1</sub></th>
-                                  <th class="table-header">σ<sub>sup2</sub></th>
-                              </tr>
-                          </thead>
-                          <tbody id="individual-stresses-tbody">
-                              </tbody>
-                      </table>
-                  </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full results-table">
+                            <thead>
+                                <tr>
+                                    <th class="table-header">Ação</th>
+                                    <th class="table-header">σ<sub>inf</sub></th>
+                                    <th class="table-header">σ<sub>sup1</sub></th>
+                                    <th class="table-header">σ<sub>sup2</sub></th>
+                                </tr>
+                            </thead>
+                            <tbody id="individual-stresses-tbody">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="card lg:col-span-1"> <h3 class="text-lg font-semibold text-gray-700 mb-3">Tensões Limites (tf/m²)</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full results-table">
-                             <thead>
+                            <thead>
                                 <tr>
                                     <th class="table-header">Verif.</th>
                                     <th class="table-header">σ<sub>inf</sub></th>
@@ -411,7 +311,7 @@
                                 <tr><td class="table-cell font-semibold">0 (ATO)</td><td id="limit-inf-0" class="table-cell text-right"></td><td id="limit-sup1-0" class="table-cell text-right"></td><td id="limit-sup2-0" class="table-cell text-right">-</td></tr>
                                 <tr><td class="table-cell font-semibold">1 (ATO)</td><td id="limit-inf-1" class="table-cell text-right"></td><td id="limit-sup1-1" class="table-cell text-right"></td><td id="limit-sup2-1" class="table-cell text-right">-</td></tr>
                                 <tr><td class="table-cell font-semibold">2 (Interm.)</td><td id="limit-inf-2" class="table-cell text-right"></td><td id="limit-sup1-2" class="table-cell text-right"></td><td id="limit-sup2-2" class="table-cell text-right">-</td></tr>
-                                <tr><td class="table-cell font-semibold">3 (Interm.)</td><td id="limit-inf-3" class="table-cell text-right"></td><td id="limit-sup1-3" class="table-cell text-right"></td><td id="limit-sup2-3" class="table-cell text-right">-</td></tr>
+                                <tr><td class="table-cell font-semibold">3 (Interm.)</td><td id="limit-inf-3" class="table-cell text-right"></td><td id="limit-sup1-3" class="table-cell text-right">-</td><td id="limit-sup2-3" class="table-cell text-right"></td></tr>
                                 <tr><td class="table-cell font-semibold">4 (ELS-F)</td><td id="limit-inf-4" class="table-cell text-right"></td><td id="limit-sup1-4" class="table-cell text-right">-</td><td id="limit-sup2-4" class="table-cell text-right"></td></tr>
                                 <tr><td class="table-cell font-semibold">5 (ELS-D)</td><td id="limit-inf-5" class="table-cell text-right"></td><td id="limit-sup1-5" class="table-cell text-right">-</td><td id="limit-sup2-5" class="table-cell text-right"></td></tr>
                             </tbody>
@@ -419,7 +319,7 @@
                     </div>
                 </div>
 
-                 <div class="card lg:col-span-1"> <h3 class="text-lg font-semibold text-gray-700 mb-3">Tensões Calculadas (tf/m²)</h3>
+                <div class="card lg:col-span-1"> <h3 class="text-lg font-semibold text-gray-700 mb-3">Tensões Calculadas (tf/m²)</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full results-table">
                             <thead>
@@ -432,668 +332,781 @@
                                 </tr>
                             </thead>
                             <tbody id="stresses-tbody">
+                                <tr> <td class="table-cell font-semibold">0</td> <td id="stress-inf-0" class="table-cell text-right"></td> <td id="stress-sup1-0" class="table-cell text-right"></td> <td id="stress-sup2-0" class="table-cell text-right">-</td> <td id="check-0" class="table-cell text-center"></td> </tr>
+                                <tr> <td class="table-cell font-semibold">1</td> <td id="stress-inf-1" class="table-cell text-right"></td> <td id="stress-sup1-1" class="table-cell text-right"></td> <td id="stress-sup2-1" class="table-cell text-right">-</td> <td id="check-1" class="table-cell text-center"></td> </tr>
+                                <tr> <td class="table-cell font-semibold">2</td> <td id="stress-inf-2" class="table-cell text-right"></td> <td id="stress-sup1-2" class="table-cell text-right"></td> <td id="stress-sup2-2" class="table-cell text-right">-</td> <td id="check-2" class="table-cell text-center"></td> </tr>
+                                <tr> <td class="table-cell font-semibold">3</td> <td id="stress-inf-3" class="table-cell text-right"></td> <td id="stress-sup1-3" class="table-cell text-right"></td> <td id="stress-sup2-3" class="table-cell text-right"></td> <td id="check-3" class="table-cell text-center"></td> </tr>
+                                <tr> <td class="table-cell font-semibold">4</td> <td id="stress-inf-4" class="table-cell text-right"></td> <td id="stress-sup1-4" class="table-cell text-right"></td> <td id="stress-sup2-4" class="table-cell text-right"></td> <td id="check-4" class="table-cell text-center"></td> </tr>
+                                <tr> <td class="table-cell font-semibold">5</td> <td id="stress-inf-5" class="table-cell text-right"></td> <td id="stress-sup1-5" class="table-cell text-right"></td> <td id="stress-sup2-5" class="table-cell text-right"></td> <td id="check-5" class="table-cell text-center"></td> </tr>
+                            </tbody>
+                        </table>
+                        <p class="text-xs text-gray-500 mt-2 text-center">Combinações: 0,1: ATO; 2,3: Interm.; 4: ELS-F; 5: ELS-D</p>
+                    </div>
+                </div>
+
+                <div class="card lg:col-span-2">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Momentos de Descompressão (tf.m)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full results-table">
+                            <thead>
                                 <tr>
-                                    <td class="table-cell font-semibold">0</td>
-                                    <td id="stress-inf-0" class="table-cell text-right"></td>
-                                    <td id="stress-sup1-0" class="table-cell text-right"></td>
-                                    <td id="stress-sup2-0" class="table-cell text-right">-</td>
-                                    <td id="check-0" class="table-cell text-center"></td>
+                                    <th class="table-header">Descrição</th>
+                                    <th class="table-header">Valor (tf.m)</th>
                                 </tr>
-                                 <tr>
-                                    <td class="table-cell font-semibold">1</td>
-                                    <td id="stress-inf-1" class="table-cell text-right"></td>
-                                    <td id="stress-sup1-1" class="table-cell text-right"></td>
-                                    <td id="stress-sup2-1" class="table-cell text-right">-</td>
-                                    <td id="check-1" class="table-cell text-center"></td>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="table-cell">M<sub>d,inicial</sub> (P<sub>0</sub>, Seção Inicial)</td>
+                                    <td id="result-md-inicial" class="table-cell text-right"></td>
                                 </tr>
-                                 <tr>
-                                    <td class="table-cell font-semibold">2</td>
-                                    <td id="stress-inf-2" class="table-cell text-right"></td>
-                                    <td id="stress-sup1-2" class="table-cell text-right"></td>
-                                    <td id="stress-sup2-2" class="table-cell text-right">-</td>
-                                    <td id="check-2" class="table-cell text-center"></td>
-                                </tr>
-                                 <tr>
-                                    <td class="table-cell font-semibold">3</td>
-                                    <td id="stress-inf-3" class="table-cell text-right"></td>
-                                    <td id="stress-sup1-3" class="table-cell text-right"></td>
-                                    <td id="stress-sup2-3" class="table-cell text-right">-</td>
-                                    <td id="check-3" class="table-cell text-center"></td>
-                                </tr>
-                                 <tr>
-                                    <td class="table-cell font-semibold">4</td>
-                                    <td id="stress-inf-4" class="table-cell text-right"></td>
-                                    <td id="stress-sup1-4" class="table-cell text-right"></td>
-                                    <td id="stress-sup2-4" class="table-cell text-right"></td>
-                                    <td id="check-4" class="table-cell text-center"></td>
-                                </tr>
-                                 <tr>
-                                    <td class="table-cell font-semibold">5</td>
-                                    <td id="stress-inf-5" class="table-cell text-right"></td>
-                                    <td id="stress-sup1-5" class="table-cell text-right"></td>
-                                    <td id="stress-sup2-5" class="table-cell text-right"></td>
-                                    <td id="check-5" class="table-cell text-center"></td>
+                                <tr>
+                                    <td class="table-cell">M<sub>d,final</sub> (P<sub>∞</sub>, Seção Final)</td>
+                                    <td id="result-md-final" class="table-cell text-right"></td>
                                 </tr>
                             </tbody>
                         </table>
-                         <p class="text-xs text-gray-500 mt-2 text-center">Combinações: 0,1: ATO; 2,3: Interm.; 4: ELS-F; 5: ELS-D</p>
                     </div>
                 </div>
-             </div>
-           </section>
-
+            </div>
+        </section>
     </div>
 
-    <script>
-        // --- Variáveis Globais ---
-        let currentStep = 1; // Começa na etapa 1
-        const totalSteps = 3; // Total de etapas de entrada
+<script>
+    // --- Constantes ---
+    const TF_PER_KN = 9.80665;
+    const KN_M2_TO_TF_M2 = 1 / TF_PER_KN;
+    const TF_TO_KN = TF_PER_KN;
 
-        // --- Elementos da Interface ---
-        const geometryTbody = document.getElementById('geometry-tbody');
-        const addRowBtn = document.getElementById('add-row-btn');
-        const removeRowBtn = document.getElementById('remove-row-btn');
-        const calculateBtn = document.getElementById('calculate-btn');
-        const resultsSection = document.getElementById('results-section');
-        const visualizationDiv = document.getElementById('section-visualization');
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const stepContents = [
-            document.getElementById('tab-content-geometria'),
-            document.getElementById('tab-content-materiais'),
-            document.getElementById('tab-content-acoes')
-        ];
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
+    // --- Variáveis Globais ---
+    let currentStep = 1;
+    const totalSteps = 3;
 
-        // --- Funções de Navegação ---
-        function updateNavButtons() {
-            prevBtn.disabled = currentStep === 1;
-            nextBtn.disabled = currentStep === totalSteps;
+    // --- Elementos da Interface (cache) ---
+    let geometryTbody, addRowBtn, removeRowBtn, calculateBtn, resultsSection, visualizationDiv;
+    let tabButtons, stepContents, prevBtn, nextBtn;
+    let indStresses = {}; // Tornar indStresses global para ser acessível por sumFiberStress na versão R02
+
+    // --- Funções Auxiliares ---
+    const getElement = (id) => document.getElementById(id);
+    const querySelectorAll = (selector) => document.querySelectorAll(selector);
+    const parseFloatInput = (id, defaultValue = 0) => parseFloat(getElement(id).value) || defaultValue;
+    const parseIntInput = (id, defaultValue = 0) => parseInt(getElement(id).value) || defaultValue;
+    const formatNumber = (value, decimals = 0, useDashForNull = true) => {
+        if (value === null || value === undefined || isNaN(value)) {
+            return useDashForNull ? '-' : '';
         }
+        return value.toFixed(decimals);
+    };
+    const updateElementText = (id, value) => { getElement(id).textContent = value; };
+    const updateElementValue = (id, value) => { getElement(id).value = value; };
+    const safeGet = (obj, prop) => (obj && obj[prop] !== null && obj[prop] !== undefined) ? obj[prop] : 0;
+    const flexStress = (moment, modulus) => (modulus > 1e-9 ? moment / modulus : 0);
+    const axialStress = (force, area) => (area > 1e-9 ? force / area : 0);
 
-        function goToStep(stepNumber) {
-            if (stepNumber < 1 || stepNumber > totalSteps) return;
-            currentStep = stepNumber;
-            tabButtons.forEach((button, index) => {
-                button.classList.toggle('tab-button-active', index + 1 === currentStep);
-                button.classList.toggle('tab-button-inactive', index + 1 !== currentStep);
+    // --- Funções de Navegação ---
+    function updateNavButtons() {
+        prevBtn.disabled = currentStep === 1;
+        nextBtn.disabled = currentStep === totalSteps;
+    }
+
+    function goToStep(stepNumber) {
+        if (stepNumber < 1 || stepNumber > totalSteps) return;
+        currentStep = stepNumber;
+        tabButtons.forEach((button, index) => {
+            button.classList.toggle('tab-button-active', index + 1 === currentStep);
+            button.classList.toggle('tab-button-inactive', index + 1 !== currentStep);
+        });
+        stepContents.forEach((content, index) => {
+            content.classList.toggle('hidden', index + 1 !== currentStep);
+        });
+        updateNavButtons();
+    }
+
+    function changeStep(direction) {
+        goToStep(currentStep + direction);
+    }
+
+    function changeTab(targetTabId) {
+        let targetStep = 1;
+        if (targetTabId === 'materiais') targetStep = 2;
+        else if (targetTabId === 'acoes') targetStep = 3;
+        goToStep(targetStep);
+    }
+
+    // --- Funções de Geometria da Viga ---
+    function addGeometryRow(binf = 0, bsup = 0, h = 0) {
+        const rowCount = geometryTbody.rows.length;
+        const row = geometryTbody.insertRow();
+        row.innerHTML = `
+            <td class="table-cell font-medium text-center">${rowCount + 1}</td>
+            <td class="table-cell p-1"><input type="number" step="0.001" value="${formatNumber(binf, 3, false)}" class="table-cell-input geometry-input binf" min="0"></td>
+            <td class="table-cell p-1"><input type="number" step="0.001" value="${formatNumber(bsup, 3, false)}" class="table-cell-input geometry-input bsup" min="0"></td>
+            <td class="table-cell p-1"><input type="number" step="0.001" value="${formatNumber(h, 3, false)}" class="table-cell-input geometry-input h" min="0"></td>
+            <td class="table-cell p-1"><input type="number" class="table-cell-output area" readonly></td>
+        `;
+        row.querySelectorAll('.geometry-input').forEach(input => {
+            input.addEventListener('input', handleGeometryInputChange);
+        });
+        calculateRowArea({ target: row.querySelector('.geometry-input') });
+    }
+
+    function removeGeometryRow() {
+        if (geometryTbody.rows.length > 1) {
+            geometryTbody.deleteRow(-1);
+            updatePrestressForcesAndMomentsInActionsUI();
+            drawSection();
+        }
+    }
+
+    function handleGeometryInputChange(event) {
+        calculateRowArea(event);
+        updatePrestressForcesAndMomentsInActionsUI();
+        drawSection();
+    }
+
+    function calculateRowArea(event) {
+        const row = event.target.closest('tr');
+        if (!row) return;
+        const binfInput = row.querySelector('.binf');
+        const bsupInput = row.querySelector('.bsup');
+        const hInput = row.querySelector('.h');
+        const areaOutput = row.querySelector('.area');
+
+        if (!binfInput || !bsupInput || !hInput || !areaOutput) return;
+
+        const binf = parseFloat(binfInput.value) || 0;
+        const bsup = parseFloat(bsupInput.value) || 0;
+        const h = parseFloat(hInput.value) || 0;
+        const area = (binf + bsup) / 2 * h;
+        areaOutput.value = formatNumber(area, 3, false);
+    }
+
+    // --- Coleta de Dados de Entrada ---
+    function getInputs() {
+        const inputs = {
+            geometry: [],
+            bf1: parseFloatInput('bf1'), hf1: parseFloatInput('hf1'),
+            bf2: parseFloatInput('bf2'), hf2: parseFloatInput('hf2'),
+            fckj_ato_tfm2: parseFloatInput('fckj_ato'),
+            fckj_servico_tfm2: parseFloatInput('fckj_servico'),
+            fck28_tfm2: parseFloatInput('fck28'),
+            alpha: parseFloatInput('alpha', 1.2),
+            cg_cables1: parseFloatInput('cg_cables1'), num_cables1: parseIntInput('num_cables1'),
+            po1_per_cable: parseFloatInput('po1'), pinf1_per_cable: parseFloatInput('pinf1'),
+            ato_percentage: parseFloatInput('ato_percentage', 100),
+            cg_cables2: parseFloatInput('cg_cables2'), num_cables2: parseIntInput('num_cables2'),
+            po2_per_cable: parseFloatInput('po2'), pinf2_per_cable: parseFloatInput('pinf2'),
+            mg1: parseFloatInput('mg1'), mg2: parseFloatInput('mg2'),
+            mg3: parseFloatInput('mg3'), mq: parseFloatInput('mq'),
+            ng1: parseFloatInput('ng1'), ng2: parseFloatInput('ng2'),
+            ng3: parseFloatInput('ng3'), nq: parseFloatInput('nq'),
+            psi1: parseFloatInput('psi1'), psi2: parseFloatInput('psi2')
+        };
+
+        geometryTbody.querySelectorAll('tr').forEach(row => {
+            inputs.geometry.push({
+                binf: parseFloat(row.querySelector('.binf').value) || 0,
+                bsup: parseFloat(row.querySelector('.bsup').value) || 0,
+                h: parseFloat(row.querySelector('.h').value) || 0,
+                area: parseFloat(row.querySelector('.area').value) || 0
             });
-            stepContents.forEach((content, index) => {
-                content.classList.toggle('hidden', index + 1 !== currentStep);
-            });
-            updateNavButtons();
-        }
+        });
 
-        function changeStep(direction) {
-            const newStep = currentStep + direction;
-            goToStep(newStep);
-        }
+        inputs.Poo1_total_tf = inputs.po1_per_cable * inputs.num_cables1;
+        inputs.Poo2_total_tf = inputs.po2_per_cable * inputs.num_cables2;
+        inputs.Pinf1_total_tf = inputs.pinf1_per_cable * inputs.num_cables1;
+        inputs.Pinf2_total_tf = inputs.pinf2_per_cable * inputs.num_cables2;
 
-        function changeTab(targetTabId) {
-            let targetStep = 1;
-            if (targetTabId === 'materiais') targetStep = 2;
-            else if (targetTabId === 'acoes') targetStep = 3;
-            goToStep(targetStep);
-        }
+        inputs.fckj_ato_mpa = inputs.fckj_ato_tfm2 * TF_TO_KN / 1000;
+        inputs.fckj_servico_mpa = inputs.fckj_servico_tfm2 * TF_TO_KN / 1000;
+        inputs.fck28_mpa = inputs.fck28_tfm2 * TF_TO_KN / 1000;
 
-        // --- Funções de Geometria ---
-        function addGeometryRow(binf = 0, bsup = 0, h = 0) {
-            const rowCount = geometryTbody.rows.length;
-            const row = geometryTbody.insertRow();
-            row.innerHTML = `
-                <td class="table-cell font-medium text-center">${rowCount + 1}</td>
-                <td class="table-cell p-1"><input type="number" step="0.001" value="${binf.toFixed(3)}" class="table-cell-input geometry-input binf"></td>
-                <td class="table-cell p-1"><input type="number" step="0.001" value="${bsup.toFixed(3)}" class="table-cell-input geometry-input bsup"></td>
-                <td class="table-cell p-1"><input type="number" step="0.001" value="${h.toFixed(3)}" class="table-cell-input geometry-input h"></td>
-                <td class="table-cell p-1"><input type="number" class="table-cell-output area" readonly></td>
-            `;
-            row.querySelectorAll('.geometry-input').forEach(input => { input.addEventListener('input', handleGeometryInputChange); });
-            calculateRowArea({ target: row.querySelector('.geometry-input') });
-        }
+        inputs.Poo1_total_kn = inputs.Poo1_total_tf * TF_TO_KN;
+        inputs.Poo2_total_kn = inputs.Poo2_total_tf * TF_TO_KN;
+        inputs.Pinf1_total_kn = inputs.Pinf1_total_tf * TF_TO_KN;
+        inputs.Pinf2_total_kn = inputs.Pinf2_total_tf * TF_TO_KN;
 
-        function removeGeometryRow() {
-            if (geometryTbody.rows.length > 1) { geometryTbody.deleteRow(-1); updatePrestressMomentsUI(); drawSection(); }
-        }
+        inputs.mg1_knm = inputs.mg1 * TF_TO_KN;
+        inputs.mg2_knm = inputs.mg2 * TF_TO_KN;
+        inputs.mg3_knm = inputs.mg3 * TF_TO_KN;
+        inputs.mq_knm = inputs.mq * TF_TO_KN;
 
-         function handleGeometryInputChange(event) {
-             calculateRowArea(event); updatePrestressMomentsUI(); drawSection();
-         }
+        inputs.ng1_kn = inputs.ng1 * TF_TO_KN;
+        inputs.ng2_kn = inputs.ng2 * TF_TO_KN;
+        inputs.ng3_kn = inputs.ng3 * TF_TO_KN;
+        inputs.nq_kn = inputs.nq * TF_TO_KN;
 
-        function calculateRowArea(event) {
-            const row = event.target.closest('tr'); if (!row) return; const binfInput = row.querySelector('.binf'); const bsupInput = row.querySelector('.bsup'); const hInput = row.querySelector('.h'); const areaOutput = row.querySelector('.area'); if (!binfInput || !bsupInput || !hInput || !areaOutput) return; const binf = parseFloat(binfInput.value) || 0; const bsup = parseFloat(bsupInput.value) || 0; const h = parseFloat(hInput.value) || 0; const area = (binf + bsup) / 2 * h; areaOutput.value = area.toFixed(3);
-        }
+        return inputs;
+    }
 
-        // --- Inicialização ---
-        function initializeCalculator() {
-            geometryTbody.innerHTML = '';
-            addGeometryRow(0.780, 0.780, 0.350);
-            addGeometryRow(0.780, 0.220, 0.280);
-            addGeometryRow(0.220, 0.220, 1.620);
-            addGeometryRow(0.220, 1.300, 0.030);
-            addGeometryRow(1.300, 1.300, 0.120);
-            document.getElementById('bf1').value = "1.00";
-            document.getElementById('hf1').value = "0.11";
-            document.getElementById('bf2').value = "3.455";
-            document.getElementById('hf2').value = "0.14";
-            document.getElementById('fckj_ato').value = "3500";
-            document.getElementById('fckj_servico').value = "3500"; // Semanticamente fck_etapa_interm
-            document.getElementById('fck28').value = "4500";
-            document.getElementById('alpha').value = "1.2";
-            document.getElementById('cg_cables1').value = "0.209";
-            document.getElementById('num_cables1').value = "46";
-            document.getElementById('po1').value = "21.1";
-            document.getElementById('pinf1').value = "17.8";
-            document.getElementById('ato_percentage').value = "100";
-            document.getElementById('cg_cables2').value = "0.0";
-            document.getElementById('num_cables2').value = "0";
-            document.getElementById('po2').value = "0.0";
-            document.getElementById('pinf2').value = "0.0";
-            document.getElementById('mg1').value = "377.0";
-            document.getElementById('mg2').value = "346.0";
-            document.getElementById('mg3').value = "262.0";
-            document.getElementById('mq').value = "537.0";
-            document.getElementById('psi1').value = "0.50";
-            document.getElementById('psi2').value = "0.30";
-            document.getElementById('ng1').value = "0.0";
-            document.getElementById('ng2').value = "0.0";
-            document.getElementById('ng3').value = "0.0";
-            document.getElementById('nq').value = "0.0";
+    // --- Funções de Cálculo de Engenharia ---
+    function calculateGeometricProperties(geometry, bf1, hf1, bf2, hf2) {
+        let area_inicial = 0, static_moment_y_inicial = 0, inertia_elements_cg_inicial = 0;
+        let h_total_inicial = 0, current_y_base = 0;
 
-            addRowBtn.addEventListener('click', () => { addGeometryRow(); updatePrestressMomentsUI(); drawSection(); });
-            removeRowBtn.addEventListener('click', removeGeometryRow);
-            calculateBtn.addEventListener('click', performCalculations);
-
-             document.querySelectorAll('.prestress-input, #bf1, #hf1, #bf2, #hf2').forEach(input => {
-                 input.addEventListener('input', () => {
-                     updatePrestressMomentsUI();
-                     drawSection();
-                 });
-             });
-             updatePrestressMomentsUI();
-             drawSection();
-             goToStep(1);
-        }
-
-        // --- Funções de Cálculo Principais ---
-         function getInputs() {
-             const inputs = {
-                geometry: [],
-                bf1: parseFloat(document.getElementById('bf1').value) || 0,
-                hf1: parseFloat(document.getElementById('hf1').value) || 0,
-                bf2: parseFloat(document.getElementById('bf2').value) || 0,
-                hf2: parseFloat(document.getElementById('hf2').value) || 0,
-                fckj_ato_tfm2: parseFloat(document.getElementById('fckj_ato').value) || 0,
-                // fckj_servico_tfm2 agora é interpretado como fck_etapa_intermedia_tfm2
-                fck_etapa_interm_tfm2: parseFloat(document.getElementById('fckj_servico').value) || 0,
-                fck28_tfm2: parseFloat(document.getElementById('fck28').value) || 0,
-                alpha: parseFloat(document.getElementById('alpha').value) || 1.2,
-                cg_cables1: parseFloat(document.getElementById('cg_cables1').value) || 0,
-                num_cables1: parseInt(document.getElementById('num_cables1').value) || 0,
-                po1_per_cable: parseFloat(document.getElementById('po1').value) || 0,
-                pinf1_per_cable: parseFloat(document.getElementById('pinf1').value) || 0,
-                ato_percentage: parseFloat(document.getElementById('ato_percentage').value) || 100,
-                cg_cables2: parseFloat(document.getElementById('cg_cables2').value) || 0,
-                num_cables2: parseInt(document.getElementById('num_cables2').value) || 0,
-                po2_per_cable: parseFloat(document.getElementById('po2').value) || 0,
-                pinf2_per_cable: parseFloat(document.getElementById('pinf2').value) || 0,
-                mg1: parseFloat(document.getElementById('mg1').value) || 0,
-                mg2: parseFloat(document.getElementById('mg2').value) || 0,
-                mg3: parseFloat(document.getElementById('mg3').value) || 0,
-                mq: parseFloat(document.getElementById('mq').value) || 0,
-                ng1: parseFloat(document.getElementById('ng1').value) || 0,
-                ng2: parseFloat(document.getElementById('ng2').value) || 0,
-                ng3: parseFloat(document.getElementById('ng3').value) || 0,
-                nq: parseFloat(document.getElementById('nq').value) || 0,
-                psi1: parseFloat(document.getElementById('psi1').value) || 0,
-                psi2: parseFloat(document.getElementById('psi2').value) || 0
-             };
-             const rows = geometryTbody.querySelectorAll('tr'); rows.forEach(row => { inputs.geometry.push({ binf: parseFloat(row.querySelector('.binf').value) || 0, bsup: parseFloat(row.querySelector('.bsup').value) || 0, h: parseFloat(row.querySelector('.h').value) || 0, area: parseFloat(row.querySelector('.area').value) || 0 }); });
-             inputs.Poo1_total_tf = inputs.po1_per_cable * inputs.num_cables1; inputs.Poo2_total_tf = inputs.po2_per_cable * inputs.num_cables2; inputs.Pinf1_total_tf = inputs.pinf1_per_cable * inputs.num_cables1; inputs.Pinf2_total_tf = inputs.pinf2_per_cable * inputs.num_cables2;
-
-             // Conversões para MPa e kN
-             const tfm2_to_mpa = 1 / 101.97;
-             inputs.fckj_ato_mpa = inputs.fckj_ato_tfm2 * tfm2_to_mpa;
-             inputs.fck_etapa_interm_mpa = inputs.fck_etapa_interm_tfm2 * tfm2_to_mpa;
-             inputs.fck28_mpa = inputs.fck28_tfm2 * tfm2_to_mpa;
-
-             const tf_to_kn = 9.80665;
-             inputs.fckj_ato_knm2 = inputs.fckj_ato_tfm2 * tf_to_kn; // fck em kN/m2
-             inputs.fck_etapa_interm_knm2 = inputs.fck_etapa_interm_tfm2 * tf_to_kn;
-             inputs.fck28_knm2 = inputs.fck28_tfm2 * tf_to_kn;
-
-             inputs.Poo1_total_kn = inputs.Poo1_total_tf * tf_to_kn; inputs.Poo2_total_kn = inputs.Poo2_total_tf * tf_to_kn; inputs.Pinf1_total_kn = inputs.Pinf1_total_tf * tf_to_kn; inputs.Pinf2_total_kn = inputs.Pinf2_total_tf * tf_to_kn;
-             inputs.mg1_knm = inputs.mg1 * tf_to_kn; inputs.mg2_knm = inputs.mg2 * tf_to_kn; inputs.mg3_knm = inputs.mg3 * tf_to_kn; inputs.mq_knm = inputs.mq * tf_to_kn;
-             inputs.ng1_kn = inputs.ng1 * tf_to_kn; inputs.ng2_kn = inputs.ng2 * tf_to_kn; inputs.ng3_kn = inputs.ng3 * tf_to_kn; inputs.nq_kn = inputs.nq * tf_to_kn;
-             return inputs;
-         }
-
-        function calculateGeometricProperties(geometry, bf1, hf1, bf2, hf2) {
-             let area_inicial = 0; let static_moment_y_inicial = 0; let inertia_elements_cg_inicial = 0; let h_total_inicial = 0; let current_y_base = 0;
-             geometry.forEach(el => { if (el.h > 0 && el.area > 0) { const el_cg_y = current_y_base + el.h / 2; area_inicial += el.area; static_moment_y_inicial += el.area * el_cg_y; let el_inertia_cg; if (Math.abs(el.binf - el.bsup) < 1e-9) { el_inertia_cg = el.binf * Math.pow(el.h, 3) / 12; } else { el_inertia_cg = (Math.pow(el.h, 3) / 36.0) * (el.binf*el.binf + 4*el.binf*el.bsup + el.bsup*el.bsup) / (el.binf + el.bsup); } inertia_elements_cg_inicial += el_inertia_cg; h_total_inicial += el.h; current_y_base += el.h; } });
-             const y_inf_inicial = area_inicial > 1e-9 ? static_moment_y_inicial / area_inicial : 0; const y_sup_inicial = h_total_inicial - y_inf_inicial;
-             let inertia_parallel_axis_inicial = 0; current_y_base = 0;
-             geometry.forEach(el => { if (el.h > 0 && el.area > 0) { const el_cg_y = current_y_base + el.h / 2; const dist_cg_sq = Math.pow(el_cg_y - y_inf_inicial, 2); inertia_parallel_axis_inicial += el.area * dist_cg_sq; current_y_base += el.h; } });
-             const inertia_total_inicial = inertia_elements_cg_inicial + inertia_parallel_axis_inicial;
-             const w_inf_inicial = y_inf_inicial > 1e-9 ? inertia_total_inicial / y_inf_inicial : 0; const w_sup1_inicial = y_sup_inicial > 1e-9 ? inertia_total_inicial / y_sup_inicial : 0; const w_sup2_inicial = 0;
-             const area_laje1 = bf1 * hf1; const area_laje2 = bf2 * hf2; const area_final = area_inicial + area_laje1 + area_laje2;
-             const y_cg_laje1 = h_total_inicial + hf1 / 2; const y_cg_laje2 = h_total_inicial + hf1 + hf2 / 2;
-             const static_moment_y_final = static_moment_y_inicial + area_laje1 * y_cg_laje1 + area_laje2 * y_cg_laje2;
-             const y_inf_final = area_final > 1e-9 ? static_moment_y_final / area_final : 0; const h_total_final = h_total_inicial + hf1 + hf2; const y_sup_final = h_total_final - y_inf_final;
-             const inertia_laje1_cg = bf1 * Math.pow(hf1, 3) / 12; const inertia_laje2_cg = bf2 * Math.pow(hf2, 3) / 12;
-             const dist_cg_viga_final_sq = Math.pow(y_inf_inicial - y_inf_final, 2); const dist_cg_laje1_final_sq = Math.pow(y_cg_laje1 - y_inf_final, 2); const dist_cg_laje2_final_sq = Math.pow(y_cg_laje2 - y_inf_final, 2);
-             const inertia_total_final = (inertia_total_inicial + area_inicial * dist_cg_viga_final_sq) + (inertia_laje1_cg + area_laje1 * dist_cg_laje1_final_sq) + (inertia_laje2_cg + area_laje2 * dist_cg_laje2_final_sq);
-             const w_inf_final = y_inf_final > 1e-9 ? inertia_total_final / y_inf_final : 0; const y_sup1_final_dist = Math.abs(h_total_inicial - y_inf_final); const w_sup1_final = y_sup1_final_dist > 1e-9 ? inertia_total_final / y_sup1_final_dist : 0; const w_sup2_final = y_sup_final > 1e-9 ? inertia_total_final / y_sup_final : 0;
-             return { inicial: { area: area_inicial, y_inf: y_inf_inicial, y_sup: y_sup_inicial, inertia: inertia_total_inicial, w_inf: w_inf_inicial, w_sup1: w_sup1_inicial, w_sup2: w_sup2_inicial, h_total: h_total_inicial }, final:    { area: area_final,    y_inf: y_inf_final,    y_sup: y_sup_final,    inertia: inertia_total_final,    w_inf: w_inf_final,    w_sup1: w_sup1_final,    w_sup2: w_sup2_final, h_total: h_total_final } };
-        }
-
-        function calculatePrestressForces(inputs) {
-            const Np1o = inputs.Poo1_total_tf;
-            const Np2o = inputs.Poo2_total_tf;
-            const Np1oo = inputs.Pinf1_total_tf;
-            const Np2oo = inputs.Pinf2_total_tf;
-            return { Np1o: -Np1o, Np2o: -Np2o, Np1oo: -Np1oo, Np2oo: -Np2oo };
-        }
-
-        function calculatePrestressMoments(inputs, properties) {
-            const P0_1_tf = inputs.Poo1_total_tf; const Pinf_1_tf = inputs.Pinf1_total_tf; const cg1 = inputs.cg_cables1;
-            const e0_1_inicial = properties.inicial.y_inf - cg1;
-            const einf_1_final = properties.final.y_inf - cg1; // Excentricidade P1inf em relação ao CG da seção final
-
-            const P0_2_tf = inputs.Poo2_total_tf; const Pinf_2_tf = inputs.Pinf2_total_tf; const cg2 = inputs.cg_cables2;
-            const e0_2_inicial = properties.inicial.y_inf - cg2; // P20 age na seção inicial
-            const einf_2_final = properties.final.y_inf - cg2;   // P2inf age na seção final
-
-            const Mp1o = P0_1_tf * e0_1_inicial;
-            const Mp2o = P0_2_tf * e0_2_inicial;
-            const Mp1oo = Pinf_1_tf * einf_1_final; // Momento de P1inf na seção final
-            const Mp2oo = Pinf_2_tf * einf_2_final; // Momento de P2inf na seção final
-            return { Mp1o, Mp2o, Mp1oo, Mp2oo };
-        }
-
-        // --- FUNÇÃO ATUALIZADA PARA CALCULAR LIMITES --- (Ação 2 Implementada)
-        function calculateLimitStresses(inputs) { // Recebe todos os inputs para ter acesso a alpha, fcks
-            const { fckj_ato_mpa, fck_etapa_interm_mpa, fck28_mpa, alpha } = inputs;
-
-            const mpa_to_tfm2 = 101.97; // 1 MPa = 101.97 tf/m² (aproximadamente)
-
-            // Limites ATO (Verificações 0 e 1)
-            const fctm_ato_mpa = 0.3 * Math.pow(fckj_ato_mpa, 2/3);
-            const limit_ato_comp_tfm2 = -0.7 * fckj_ato_mpa * mpa_to_tfm2;
-            const limit_ato_trac_tfm2 = alpha * fctm_ato_mpa * mpa_to_tfm2; // NBR 6118:2023, Tabela 17.2
-
-            // Limites Intermediários (Verificações 2 e 3)
-            // Assumindo que fck_etapa_interm_mpa é o fck,j para essas etapas
-            const fctm_interm_mpa = 0.3 * Math.pow(fck_etapa_interm_mpa, 2/3);
-            const limit_interm_trac_tfm2 = alpha * fctm_interm_mpa * mpa_to_tfm2; // Tração para ambas fibras se aplicável
-                                                                                // NBR6118, 17.2.4.3.2 (a) - Tensão de tração na flexão ... em fases construtivas
-
-            // Compressão em fases construtivas (pode ser fck da idade ou 0.7*fck28 se mais crítico ou laje já com fck28)
-            // Optando por fck28 para compressão, mais comum para elementos pré-moldados onde a capa é posterior.
-            const limit_interm_comp_tfm2 = -0.7 * fck28_mpa * mpa_to_tfm2; // Para verificação 2 (antes de P2) e 3 (após P2)
-
-            // Limites ELS Frequente (Verificação 4)
-            const fctk_inf_mpa = 0.21 * Math.pow(fck28_mpa, 2/3); // NBR 6118:2023, Tabela 17.2 (a) - análise linear
-            const limit_elsf_trac_tfm2 = fctk_inf_mpa * mpa_to_tfm2;
-            const limit_elsf_comp_tfm2 = -0.60 * fck28_mpa * mpa_to_tfm2; // Compressão excessiva
-
-            // Limites ELS Duração (Verificação 5) - Descompressão
-            const limit_elsd_trac_tfm2 = 0; // Descompressão (ou pequena tração se fctm for usado, mas 0 é comum para ELS-D)
-            const limit_elsd_comp_tfm2 = -0.45 * fck28_mpa * mpa_to_tfm2; // Compressão rara
-
-            return [
-                // Verif 0 (ATO - %P0)
-                { inf: limit_ato_comp_tfm2, sup1: limit_ato_trac_tfm2,  sup2: null },
-                // Verif 1 (ATO - 100%P0)
-                { inf: limit_ato_comp_tfm2, sup1: limit_ato_trac_tfm2,  sup2: null },
-                // Verif 2 (Interm. G1+G2+P01) - Tração no inf, Comp no sup1 (viga)
-                { inf: limit_interm_trac_tfm2, sup1: limit_interm_comp_tfm2, sup2: null },
-                 // Verif 3 (Interm. G1+G2+P01+P02) - Comp no inf, Tração no sup1 (viga). sup2 ainda não relevante para P02.
-                { inf: limit_interm_comp_tfm2, sup1: limit_interm_trac_tfm2, sup2: null }, // MODIFICADO: sup2 é null
-                // Verif 4 (ELS-F)
-                { inf: limit_elsf_trac_tfm2,   sup1: null,                      sup2: limit_elsf_comp_tfm2 }, // sup1 não é geralmente crítico aqui, foco em inf e sup2 (laje)
-                // Verif 5 (ELS-D)
-                { inf: limit_elsd_trac_tfm2,   sup1: null,                      sup2: limit_elsd_comp_tfm2 }
-            ];
-        }
-
-
-        // --- FUNÇÃO ATUALIZADA PARA CALCULAR TENSÕES DAS COMBINAÇÕES ELS ---
-        // (Ações 3, 4, 5, 6 implementadas/revisadas)
-        function calculateStressesAndVerifications(inputs, properties, limits) {
-            const results = [];
-            const individualStresses = {}; // Objeto para armazenar tensões individuais
-            const { inicial: prop_i, final: prop_f } = properties;
-            const {
-                Poo1_total_kn: P0_1, Pinf1_total_kn: Pinf_1, Poo2_total_kn: P0_2, Pinf2_total_kn: Pinf_2,
-                mg1_knm: Mg1, mg2_knm: Mg2, mg3_knm: Mg3, mq_knm: Mq,
-                ng1_kn: Ng1, ng2_kn: Ng2, ng3_kn: Ng3, nq_kn: Nq,
-                cg_cables1, cg_cables2, psi1, psi2, ato_percentage
-            } = inputs;
-
-            const knm2_to_tfm2 = 1 / 9.80665; // Fator de conversão de kN/m² para tf/m²
-
-            // Excentricidades da protensão
-            // P0_1 e P0_2 agem na seção inicial (prop_i)
-            const e0_1_i = prop_i.y_inf - cg_cables1;
-            const e0_2_i = prop_i.y_inf - cg_cables2;
-
-            // Pinf_1 e Pinf_2 agem na seção final (prop_f) para combinações de serviço
-            const einf_1_f = prop_f.y_inf - cg_cables1;
-            const einf_2_f = prop_f.y_inf - cg_cables2;
-
-            // Tensões axiais da protensão
-            // P0_1, P0_2 sobre área inicial
-            const sigma_ax_p0_1_i = (prop_i.area > 1e-9) ? -P0_1 / prop_i.area : 0;
-            const sigma_ax_p0_2_i = (prop_i.area > 1e-9) ? -P0_2 / prop_i.area : 0;
-            individualStresses.p1o_ax = { inf: sigma_ax_p0_1_i, sup1: sigma_ax_p0_1_i, sup2: null };
-            individualStresses.p2o_ax = { inf: sigma_ax_p0_2_i, sup1: sigma_ax_p0_2_i, sup2: null };
-
-            // Pinf_1, Pinf_2 sobre área final (para combinações de serviço)
-            const sigma_ax_pinf_1_f = (prop_f.area > 1e-9) ? -Pinf_1 / prop_f.area : 0;
-            const sigma_ax_pinf_2_f = (prop_f.area > 1e-9) ? -Pinf_2 / prop_f.area : 0;
-            // Para tensões individuais, mostrar o efeito na seção que atua
-            individualStresses.p1oo_ax = { inf: sigma_ax_pinf_1_f, sup1: sigma_ax_pinf_1_f, sup2: sigma_ax_pinf_1_f };
-            individualStresses.p2oo_ax = { inf: sigma_ax_pinf_2_f, sup1: sigma_ax_pinf_2_f, sup2: sigma_ax_pinf_2_f };
-
-
-            // Tensões axiais das cargas permanentes e variáveis
-            const sigma_ax_ng1_i = (prop_i.area > 1e-9) ? Ng1 / prop_i.area : 0; // Ng1 na seção inicial
-            const sigma_ax_ng2_i = (prop_i.area > 1e-9) ? Ng2 / prop_i.area : 0; // Ng2 na seção inicial
-            const sigma_ax_ng3_f = (prop_f.area > 1e-9) ? Ng3 / prop_f.area : 0; // Ng3 na seção final
-            const sigma_ax_nq_f  = (prop_f.area > 1e-9) ? Nq  / prop_f.area : 0; // Nq na seção final
-            individualStresses.ng1 = { inf: sigma_ax_ng1_i, sup1: sigma_ax_ng1_i, sup2: null };
-            individualStresses.ng2 = { inf: sigma_ax_ng2_i, sup1: sigma_ax_ng2_i, sup2: null };
-            individualStresses.ng3 = { inf: sigma_ax_ng3_f, sup1: sigma_ax_ng3_f, sup2: sigma_ax_ng3_f }; // Mostrando em todas as fibras da seção final
-            individualStresses.nq  = { inf: sigma_ax_nq_f,  sup1: sigma_ax_nq_f,  sup2: sigma_ax_nq_f  };
-
-
-            // Função auxiliar para tensões de flexão
-            const flex = (M, W) => (W > 1e-9) ? M / W : 0;
-
-            // Tensões de flexão das cargas (momentos positivos -> tração inf, compressão sup)
-            const sigma_flex_mg1_inf_i  = +flex(Mg1, prop_i.w_inf); const sigma_flex_mg1_sup1_i = -flex(Mg1, prop_i.w_sup1);
-            individualStresses.mg1 = { inf: sigma_flex_mg1_inf_i, sup1: sigma_flex_mg1_sup1_i, sup2: null };
-
-            const sigma_flex_mg2_inf_i  = +flex(Mg2, prop_i.w_inf); const sigma_flex_mg2_sup1_i = -flex(Mg2, prop_i.w_sup1);
-            individualStresses.mg2 = { inf: sigma_flex_mg2_inf_i, sup1: sigma_flex_mg2_sup1_i, sup2: null };
-
-            const sigma_flex_mg3_inf_f  = +flex(Mg3, prop_f.w_inf); const sigma_flex_mg3_sup1_f = -flex(Mg3, prop_f.w_sup1); const sigma_flex_mg3_sup2_f = -flex(Mg3, prop_f.w_sup2);
-            individualStresses.mg3 = { inf: sigma_flex_mg3_inf_f, sup1: sigma_flex_mg3_sup1_f, sup2: sigma_flex_mg3_sup2_f };
-
-            const sigma_flex_mq_inf_f  = +flex(Mq, prop_f.w_inf); const sigma_flex_mq_sup1_f = -flex(Mq, prop_f.w_sup1); const sigma_flex_mq_sup2_f = -flex(Mq, prop_f.w_sup2);
-            individualStresses.mq = { inf: sigma_flex_mq_inf_f, sup1: sigma_flex_mq_sup1_f, sup2: sigma_flex_mq_sup2_f };
-
-            // Tensões de flexão da Protensão (momentos de protensão são negativos se e > 0, causando compressão inf, tração sup)
-            // P0_1 e P0_2 na seção inicial
-            const M_p1o_i = P0_1 * e0_1_i;
-            const sigma_flex_p1o_inf_i  = -flex(M_p1o_i, prop_i.w_inf); const sigma_flex_p1o_sup1_i = +flex(M_p1o_i, prop_i.w_sup1);
-            individualStresses.p1o_flex = { inf: sigma_flex_p1o_inf_i, sup1: sigma_flex_p1o_sup1_i, sup2: null };
-
-            const M_p2o_i = P0_2 * e0_2_i;
-            const sigma_flex_p2o_inf_i  = -flex(M_p2o_i, prop_i.w_inf); const sigma_flex_p2o_sup1_i = +flex(M_p2o_i, prop_i.w_sup1);
-            individualStresses.p2o_flex = { inf: sigma_flex_p2o_inf_i, sup1: sigma_flex_p2o_sup1_i, sup2: null };
-
-            // Pinf_1 e Pinf_2 na seção final
-            const M_p1oo_f = Pinf_1 * einf_1_f;
-            const sigma_flex_p1oo_inf_f  = -flex(M_p1oo_f, prop_f.w_inf); const sigma_flex_p1oo_sup1_f = +flex(M_p1oo_f, prop_f.w_sup1); const sigma_flex_p1oo_sup2_f = +flex(M_p1oo_f, prop_f.w_sup2);
-            individualStresses.p1oo_flex = { inf: sigma_flex_p1oo_inf_f, sup1: sigma_flex_p1oo_sup1_f, sup2: sigma_flex_p1oo_sup2_f };
-
-            const M_p2oo_f = Pinf_2 * einf_2_f;
-            const sigma_flex_p2oo_inf_f  = -flex(M_p2oo_f, prop_f.w_inf); const sigma_flex_p2oo_sup1_f = +flex(M_p2oo_f, prop_f.w_sup1); const sigma_flex_p2oo_sup2_f = +flex(M_p2oo_f, prop_f.w_sup2);
-            individualStresses.p2oo_flex = { inf: sigma_flex_p2oo_inf_f, sup1: sigma_flex_p2oo_sup1_f, sup2: sigma_flex_p2oo_sup2_f };
-
-
-            // Cálculo das Tensões Combinadas (em kN/m²)
-            const p0_scale_factor = ato_percentage / 100.0;
-
-            // Verif 0: ATO (%P0) = G1 + Ng1 + %P01 (sobre seção inicial)
-            // REMOVIDO FATOR 1.1
-            let stress0_inf = sigma_flex_mg1_inf_i + sigma_ax_ng1_i + (sigma_ax_p0_1_i + sigma_flex_p1o_inf_i) * p0_scale_factor;
-            let stress0_sup1 = sigma_flex_mg1_sup1_i + sigma_ax_ng1_i + (sigma_ax_p0_1_i + sigma_flex_p1o_sup1_i) * p0_scale_factor;
-            let stress0_sup2 = null;
-
-            // Verif 1: ATO (100%P0) = G1 + Ng1 + P01 (sobre seção inicial)
-            // REMOVIDO FATOR 1.1
-            let stress1_inf = sigma_flex_mg1_inf_i + sigma_ax_ng1_i + sigma_ax_p0_1_i + sigma_flex_p1o_inf_i;
-            let stress1_sup1 = sigma_flex_mg1_sup1_i + sigma_ax_ng1_i + sigma_ax_p0_1_i + sigma_flex_p1o_sup1_i;
-            let stress1_sup2 = null;
-
-            // Verif 2: Intermediária = G1 + G2 + Ng1 + Ng2 + P01 (sobre seção inicial)
-            let stress2_inf = sigma_flex_mg1_inf_i + sigma_flex_mg2_inf_i + sigma_ax_ng1_i + sigma_ax_ng2_i + sigma_ax_p0_1_i + sigma_flex_p1o_inf_i;
-            let stress2_sup1 = sigma_flex_mg1_sup1_i + sigma_flex_mg2_sup1_i + sigma_ax_ng1_i + sigma_ax_ng2_i + sigma_ax_p0_1_i + sigma_flex_p1o_sup1_i;
-            let stress2_sup2 = null;
-
-            // Verif 3: Intermediária = G1 + G2 + Ng1 + Ng2 + P01 + P02 (sobre seção inicial)
-            let stress3_inf = stress2_inf + sigma_ax_p0_2_i + sigma_flex_p2o_inf_i;
-            let stress3_sup1 = stress2_sup1 + sigma_ax_p0_2_i + sigma_flex_p2o_sup1_i;
-            let stress3_sup2 = null; // MODIFICADO: sup2 não aplicável aqui, P02 na seção inicial
-
-            // Verif 4: ELS Frequente (G1+G2+G3 + Ng1+Ng2+Ng3 + Pinf1+Pinf2 + ψ1*Mq + ψ1*Nq)
-            // G1, G2, Ng1, Ng2 sobre seção inicial (efeitos já transformados para seção final se necessário, mas aqui somamos tensões)
-            // G3, Ng3, Mq, Nq sobre seção final
-            // Pinf1, Pinf2 sobre seção final
-            let stress4_inf = (sigma_flex_mg1_inf_i + sigma_flex_mg2_inf_i) + sigma_flex_mg3_inf_f + // Momentos
-                                (sigma_ax_ng1_i + sigma_ax_ng2_i) + sigma_ax_ng3_f +               // Axiais Externos
-                                (sigma_ax_pinf_1_f + sigma_flex_p1oo_inf_f) +                     // P1inf
-                                (sigma_ax_pinf_2_f + sigma_flex_p2oo_inf_f) +                     // P2inf
-                                psi1 * (sigma_flex_mq_inf_f + sigma_ax_nq_f);                     // Ação Variável
-
-            let stress4_sup1 = (sigma_flex_mg1_sup1_i + sigma_flex_mg2_sup1_i) + sigma_flex_mg3_sup1_f +
-                                 (sigma_ax_ng1_i + sigma_ax_ng2_i) + sigma_ax_ng3_f +
-                                 (sigma_ax_pinf_1_f + sigma_flex_p1oo_sup1_f) +
-                                 (sigma_ax_pinf_2_f + sigma_flex_p2oo_sup1_f) +
-                                 psi1 * (sigma_flex_mq_sup1_f + sigma_ax_nq_f);
-
-            let stress4_sup2 = sigma_flex_mg3_sup2_f +     // Mg3
-                                 sigma_ax_ng3_f +           // Ng3
-                                 (sigma_ax_pinf_1_f + sigma_flex_p1oo_sup2_f) + // P1inf
-                                 (sigma_ax_pinf_2_f + sigma_flex_p2oo_sup2_f) + // P2inf
-                                 psi1 * (sigma_flex_mq_sup2_f + sigma_ax_nq_f);  // Mq, Nq
-
-
-            // Verif 5: ELS Duração (G1+G2+G3 + Ng1+Ng2+Ng3 + Pinf1+Pinf2 + ψ2*Mq + ψ2*Nq)
-            let stress5_inf = (sigma_flex_mg1_inf_i + sigma_flex_mg2_inf_i) + sigma_flex_mg3_inf_f +
-                                (sigma_ax_ng1_i + sigma_ax_ng2_i) + sigma_ax_ng3_f +
-                                (sigma_ax_pinf_1_f + sigma_flex_p1oo_inf_f) +
-                                (sigma_ax_pinf_2_f + sigma_flex_p2oo_inf_f) +
-                                psi2 * (sigma_flex_mq_inf_f + sigma_ax_nq_f);
-
-            let stress5_sup1 = (sigma_flex_mg1_sup1_i + sigma_flex_mg2_sup1_i) + sigma_flex_mg3_sup1_f +
-                                 (sigma_ax_ng1_i + sigma_ax_ng2_i) + sigma_ax_ng3_f +
-                                 (sigma_ax_pinf_1_f + sigma_flex_p1oo_sup1_f) +
-                                 (sigma_ax_pinf_2_f + sigma_flex_p2oo_sup1_f) +
-                                 psi2 * (sigma_flex_mq_sup1_f + sigma_ax_nq_f);
-
-            let stress5_sup2 = sigma_flex_mg3_sup2_f +
-                                 sigma_ax_ng3_f +
-                                 (sigma_ax_pinf_1_f + sigma_flex_p1oo_sup2_f) +
-                                 (sigma_ax_pinf_2_f + sigma_flex_p2oo_sup2_f) +
-                                 psi2 * (sigma_flex_mq_sup2_f + sigma_ax_nq_f);
-
-
-            const stresses_knm2 = [
-                { inf: stress0_inf, sup1: stress0_sup1, sup2: stress0_sup2 },
-                { inf: stress1_inf, sup1: stress1_sup1, sup2: stress1_sup2 },
-                { inf: stress2_inf, sup1: stress2_sup1, sup2: stress2_sup2 },
-                { inf: stress3_inf, sup1: stress3_sup1, sup2: stress3_sup2 },
-                { inf: stress4_inf, sup1: stress4_sup1, sup2: stress4_sup2 },
-                { inf: stress5_inf, sup1: stress5_sup1, sup2: stress5_sup2 }
-            ];
-
-            // --- Verificar Limites (Comparação em tf/m²) ---
-            stresses_knm2.forEach((stress, i) => {
-                const stress_tfm2 = {
-                    inf: stress.inf !== null ? stress.inf * knm2_to_tfm2 : null,
-                    sup1: stress.sup1 !== null ? stress.sup1 * knm2_to_tfm2 : null,
-                    sup2: stress.sup2 !== null ? stress.sup2 * knm2_to_tfm2 : null
-                };
-                let check_inf = true; let check_sup1 = true; let check_sup2 = true;
-
-                const checkFiber = (stressVal_tfm2, limitVal_tfm2) => {
-                    if (limitVal_tfm2 === null || stressVal_tfm2 === null) return true;
-                    const tolerance = 1e-3; // Ajustar tolerância se necessário (em tf/m²)
-                    // Tração é positiva, Compressão é negativa
-                    if (limitVal_tfm2 >= 0) { // Limite de tração (ou zero)
-                        return stressVal_tfm2 <= limitVal_tfm2 + tolerance;
-                    } else { // Limite de compressão
-                        return stressVal_tfm2 >= limitVal_tfm2 - tolerance;
-                    }
-                };
-                check_inf = checkFiber(stress_tfm2.inf, limits[i].inf);
-                // Para Verificações 4 e 5, sup1 não tem limite explícito definido, considerar OK
-                if (i === 4 || i === 5) { // ELS-F e ELS-D
-                    check_sup1 = true; // Não há limite para sup1 nessas verificações na tabela de limites
-                } else {
-                    check_sup1 = checkFiber(stress_tfm2.sup1, limits[i].sup1);
+        geometry.forEach(el => {
+            if (el.h > 0 && el.area > 0) {
+                const el_cg_y = current_y_base + el.h / 2;
+                area_inicial += el.area;
+                static_moment_y_inicial += el.area * el_cg_y;
+                let el_inertia_cg;
+                if (Math.abs(el.binf - el.bsup) < 1e-9) { // Retangular
+                    el_inertia_cg = el.binf * Math.pow(el.h, 3) / 12;
+                } else { // Trapezoidal
+                    el_inertia_cg = (Math.pow(el.h, 3) / 36.0) * (el.binf * el.binf + 4 * el.binf * el.bsup + el.bsup * el.bsup) / (el.binf + el.bsup);
                 }
-                check_sup2 = checkFiber(stress_tfm2.sup2, limits[i].sup2);
+                inertia_elements_cg_inicial += el_inertia_cg;
+                h_total_inicial += el.h;
+                current_y_base += el.h;
+            }
+        });
 
-                const check_final = check_inf && check_sup1 && check_sup2;
-                results.push({
-                    inf: stress_tfm2.inf, sup1: stress_tfm2.sup1, sup2: stress_tfm2.sup2,
-                    check: check_final ? '<span class="verification-ok">OK</span>' : '<span class="verification-fail">FALHA</span>'
-                });
+        const y_inf_inicial = area_inicial > 1e-9 ? static_moment_y_inicial / area_inicial : 0;
+        const y_sup_inicial = h_total_inicial - y_inf_inicial;
+
+        let inertia_parallel_axis_inicial = 0;
+        current_y_base = 0;
+        geometry.forEach(el => {
+            if (el.h > 0 && el.area > 0) {
+                const el_cg_y = current_y_base + el.h / 2;
+                const dist_cg_sq = Math.pow(el_cg_y - y_inf_inicial, 2);
+                inertia_parallel_axis_inicial += el.area * dist_cg_sq;
+                current_y_base += el.h;
+            }
+        });
+        const inertia_total_inicial = inertia_elements_cg_inicial + inertia_parallel_axis_inicial;
+        const w_inf_inicial = y_inf_inicial > 1e-9 ? inertia_total_inicial / y_inf_inicial : 0;
+        const w_sup1_inicial = y_sup_inicial > 1e-9 ? inertia_total_inicial / y_sup_inicial : 0;
+
+        const area_laje1 = bf1 * hf1;
+        const area_laje2 = bf2 * hf2;
+        const area_final = area_inicial + area_laje1 + area_laje2;
+
+        const y_cg_laje1 = h_total_inicial + hf1 / 2;
+        const y_cg_laje2 = h_total_inicial + hf1 + hf2 / 2;
+
+        const static_moment_y_final = static_moment_y_inicial +
+                                    (area_laje1 * y_cg_laje1) +
+                                    (area_laje2 * y_cg_laje2);
+        const y_inf_final = area_final > 1e-9 ? static_moment_y_final / area_final : 0;
+        const h_total_final = h_total_inicial + hf1 + hf2;
+        const y_sup_final = h_total_final - y_inf_final;
+
+        const inertia_laje1_cg = bf1 * Math.pow(hf1, 3) / 12;
+        const inertia_laje2_cg = bf2 * Math.pow(hf2, 3) / 12;
+
+        const dist_cg_viga_final_sq = Math.pow(y_inf_inicial - y_inf_final, 2);
+        const dist_cg_laje1_final_sq = area_laje1 > 1e-9 ? Math.pow(y_cg_laje1 - y_inf_final, 2) : 0;
+        const dist_cg_laje2_final_sq = area_laje2 > 1e-9 ? Math.pow(y_cg_laje2 - y_inf_final, 2) : 0;
+
+        const inertia_total_final = (inertia_total_inicial + area_inicial * dist_cg_viga_final_sq) +
+                                  (inertia_laje1_cg + area_laje1 * dist_cg_laje1_final_sq) +
+                                  (inertia_laje2_cg + area_laje2 * dist_cg_laje2_final_sq);
+
+        const w_inf_final = y_inf_final > 1e-9 ? inertia_total_final / y_inf_final : 0;
+        const y_sup1_final_dist = Math.abs(h_total_inicial - y_inf_final); 
+        const w_sup1_final = y_sup1_final_dist > 1e-9 ? inertia_total_final / y_sup1_final_dist : 0;
+        const w_sup2_final = y_sup_final > 1e-9 ? inertia_total_final / y_sup_final : 0; 
+
+        return {
+            inicial: { area: area_inicial, y_inf: y_inf_inicial, y_sup: y_sup_inicial, inertia: inertia_total_inicial, w_inf: w_inf_inicial, w_sup1: w_sup1_inicial, w_sup2: 0, h_total: h_total_inicial },
+            final:   { area: area_final,   y_inf: y_inf_final,   y_sup: y_sup_final,   inertia: inertia_total_final,   w_inf: w_inf_final,   w_sup1: w_sup1_final,   w_sup2: w_sup2_final, h_total: h_total_final }
+        };
+    }
+
+    function calculatePrestressForces(inputs) {
+        return {
+            Np1o: -inputs.Poo1_total_tf, Np2o: -inputs.Poo2_total_tf,
+            Np1oo: -inputs.Pinf1_total_tf, Np2oo: -inputs.Pinf2_total_tf
+        };
+    }
+
+    function calculatePrestressMoments(inputs, properties) {
+        const { inicial: prop_i, final: prop_f } = properties;
+        const e0_1_inicial = prop_i.y_inf - inputs.cg_cables1;
+        const e0_1_final = prop_f.y_inf - inputs.cg_cables1; 
+        const e0_2_inicial = prop_i.y_inf - inputs.cg_cables2;
+        const e0_2_final = prop_f.y_inf - inputs.cg_cables2; 
+        return {
+            Mp1o: inputs.Poo1_total_tf * e0_1_inicial,
+            Mp2o: inputs.Poo2_total_tf * e0_2_inicial, 
+            Mp1oo: inputs.Pinf1_total_tf * e0_1_final, 
+            Mp2oo: inputs.Pinf2_total_tf * e0_2_final  
+        };
+    }
+    
+    function calculateLimitStresses(inputs) {
+        const { fckj_ato_mpa, fckj_servico_mpa, fck28_mpa, alpha } = inputs;
+        const mpa_to_tfm2_factor = 1000 * KN_M2_TO_TF_M2;
+
+        const fctm_ato_mpa = 0.3 * Math.pow(fckj_ato_mpa, 2/3);
+        const fctm_servico_mpa = 0.3 * Math.pow(fckj_servico_mpa, 2/3); 
+
+        const fctm_ato_tfm2 = fctm_ato_mpa * mpa_to_tfm2_factor;
+        const fctm_servico_tfm2 = fctm_servico_mpa * mpa_to_tfm2_factor;
+
+        const fckj_ato_tfm2_val = fckj_ato_mpa * mpa_to_tfm2_factor;
+        const fck28_tfm2_val = fck28_mpa * mpa_to_tfm2_factor; 
+
+        const limits = [
+            { inf: -0.70 * fckj_ato_tfm2_val, sup1: alpha * fctm_ato_tfm2, sup2: null }, 
+            { inf: -0.70 * fckj_ato_tfm2_val, sup1: alpha * fctm_ato_tfm2, sup2: null }, 
+            { inf: fctm_servico_tfm2, sup1: -0.70 * fck28_tfm2_val, sup2: null },  
+            { inf: -0.70 * fck28_tfm2_val, sup1: null, sup2: fctm_servico_tfm2 },         
+            { inf: null, sup1: null, sup2: -0.60 * fck28_tfm2_val },                     
+            { inf: 0, sup1: null, sup2: -0.45 * fck28_tfm2_val }                        
+        ];
+        limits[4].inf = limits[3].sup2; 
+        return limits;
+    }
+
+    function calculateIndividualStresses(inputs, properties) {
+        const { inicial: prop_i, final: prop_f } = properties;
+        indStresses = {}; // Limpa/reinicia o objeto global indStresses
+
+        indStresses.p1o_ax = {
+            inf: axialStress(-inputs.Poo1_total_kn, prop_i.area),
+            sup1: axialStress(-inputs.Poo1_total_kn, prop_i.area),
+            sup2: null
+        };
+        const e0_1_i = prop_i.y_inf - inputs.cg_cables1;
+        const M_p1o_knm = inputs.Poo1_total_kn * e0_1_i;
+        indStresses.p1o_flex = {
+            inf: -flexStress(M_p1o_knm, prop_i.w_inf),
+            sup1: +flexStress(M_p1o_knm, prop_i.w_sup1),
+            sup2: null
+        };
+
+        indStresses.p2o_ax = {
+            inf: axialStress(-inputs.Poo2_total_kn, prop_i.area),
+            sup1: axialStress(-inputs.Poo2_total_kn, prop_i.area),
+            sup2: null
+        };
+        const e0_2_i = prop_i.y_inf - inputs.cg_cables2;
+        const M_p2o_knm = inputs.Poo2_total_kn * e0_2_i;
+        indStresses.p2o_flex = {
+            inf: -flexStress(M_p2o_knm, prop_i.w_inf),
+            sup1: +flexStress(M_p2o_knm, prop_i.w_sup1),
+            sup2: null
+        };
+        
+        const P0_1_kn = inputs.Poo1_total_kn;
+        const Pinf_1_kn = inputs.Pinf1_total_kn;
+        const delta_P1_kn = P0_1_kn - Pinf_1_kn; 
+        const cg1 = inputs.cg_cables1;
+        indStresses.p1oo_ax = { 
+            inf:  axialStress(-P0_1_kn, prop_i.area) + axialStress(delta_P1_kn, prop_f.area),
+            sup1: axialStress(-P0_1_kn, prop_i.area) + axialStress(delta_P1_kn, prop_f.area),
+            sup2: axialStress(delta_P1_kn, prop_f.area) 
+        };
+        const exc_1_i = prop_i.y_inf - cg1;
+        const exc_1_f = prop_f.y_inf - cg1;
+        indStresses.p1oo_flex = {
+            inf:  -flexStress(P0_1_kn * exc_1_i, prop_i.w_inf)   + flexStress(delta_P1_kn * exc_1_f, prop_f.w_inf),
+            sup1: +flexStress(P0_1_kn * exc_1_i, prop_i.w_sup1) - flexStress(delta_P1_kn * exc_1_f, prop_f.w_sup1),
+            sup2: -flexStress(delta_P1_kn * exc_1_f, prop_f.w_sup2)
+        };
+
+        const P0_2_kn = inputs.Poo2_total_kn;
+        const Pinf_2_kn = inputs.Pinf2_total_kn;
+        const delta_P2_kn = P0_2_kn - Pinf_2_kn; 
+        const cg2 = inputs.cg_cables2;
+        indStresses.p2oo_ax = { 
+            inf:  axialStress(-P0_2_kn, prop_i.area) + axialStress(delta_P2_kn, prop_f.area),
+            sup1: axialStress(-P0_2_kn, prop_i.area) + axialStress(delta_P2_kn, prop_f.area),
+            sup2: axialStress(delta_P2_kn, prop_f.area)
+        };
+        const exc_2_i = prop_i.y_inf - cg2;
+        const exc_2_f = prop_f.y_inf - cg2;
+        indStresses.p2oo_flex = {
+            inf:  -flexStress(P0_2_kn * exc_2_i, prop_i.w_inf)   + flexStress(delta_P2_kn * exc_2_f, prop_f.w_inf),
+            sup1: +flexStress(P0_2_kn * exc_2_i, prop_i.w_sup1) - flexStress(delta_P2_kn * exc_2_f, prop_f.w_sup1),
+            sup2: -flexStress(delta_P2_kn * exc_2_f, prop_f.w_sup2)
+        };
+
+        indStresses.ng1 = { inf: axialStress(inputs.ng1_kn, prop_i.area), sup1: axialStress(inputs.ng1_kn, prop_i.area), sup2: null };
+        indStresses.mg1 = { inf: +flexStress(inputs.mg1_knm, prop_i.w_inf), sup1: -flexStress(inputs.mg1_knm, prop_i.w_sup1), sup2: null };
+        indStresses.ng2 = { inf: axialStress(inputs.ng2_kn, prop_i.area), sup1: axialStress(inputs.ng2_kn, prop_i.area), sup2: null };
+        indStresses.mg2 = { inf: +flexStress(inputs.mg2_knm, prop_i.w_inf), sup1: -flexStress(inputs.mg2_knm, prop_i.w_sup1), sup2: null };
+        
+        indStresses.ng3 = { inf: axialStress(inputs.ng3_kn, prop_f.area), sup1: axialStress(inputs.ng3_kn, prop_f.area), sup2: axialStress(inputs.ng3_kn, prop_f.area) };
+        indStresses.mg3 = { inf: +flexStress(inputs.mg3_knm, prop_f.w_inf), sup1: -flexStress(inputs.mg3_knm, prop_f.w_sup1), sup2: -flexStress(inputs.mg3_knm, prop_f.w_sup2) };
+        indStresses.nq = { inf: axialStress(inputs.nq_kn, prop_f.area), sup1: axialStress(inputs.nq_kn, prop_f.area), sup2: axialStress(inputs.nq_kn, prop_f.area) };
+        indStresses.mq = { inf: +flexStress(inputs.mq_knm, prop_f.w_inf), sup1: -flexStress(inputs.mq_knm, prop_f.w_sup1), sup2: -flexStress(inputs.mq_knm, prop_f.w_sup2) };
+
+        return indStresses; 
+    }
+    
+    // Função calculateDecompressionMoments ajustada para usar tensões individuais
+    function calculateDecompressionMoments(inputs, properties, individualStresses_knm2) {
+        const { inicial: prop_i, final: prop_f } = properties;
+
+        // Md,inicial (baseado nas tensões de P0 na fibra inferior da seção inicial)
+        let sigma_inf_P0_kn = 0;
+        sigma_inf_P0_kn += safeGet(individualStresses_knm2.p1o_ax, 'inf');
+        sigma_inf_P0_kn += safeGet(individualStresses_knm2.p1o_flex, 'inf');
+        if (inputs.num_cables2 > 0) { // Considerar P2o apenas se houver cabos na Etapa 2
+            sigma_inf_P0_kn += safeGet(individualStresses_knm2.p2o_ax, 'inf');
+            sigma_inf_P0_kn += safeGet(individualStresses_knm2.p2o_flex, 'inf');
+        }
+        
+        const sigma_inf_P0_tfm2 = sigma_inf_P0_kn * KN_M2_TO_TF_M2;
+        const Md1_tfm = (prop_i.w_inf > 1e-9 && sigma_inf_P0_tfm2 !== 0) ? (-sigma_inf_P0_tfm2) * prop_i.w_inf : 0;
+
+        // Md,final (baseado nas tensões de P∞ na fibra inferior da seção final)
+        let sigma_inf_Pinf_kn = 0;
+        sigma_inf_Pinf_kn += safeGet(individualStresses_knm2.p1oo_ax, 'inf');
+        sigma_inf_Pinf_kn += safeGet(individualStresses_knm2.p1oo_flex, 'inf');
+        if (inputs.num_cables2 > 0) { // Considerar P2inf apenas se houver cabos na Etapa 2
+             sigma_inf_Pinf_kn += safeGet(individualStresses_knm2.p2oo_ax, 'inf');
+             sigma_inf_Pinf_kn += safeGet(individualStresses_knm2.p2oo_flex, 'inf');
+        }
+
+        const sigma_inf_Pinf_tfm2 = sigma_inf_Pinf_kn * KN_M2_TO_TF_M2;
+        const Md2_tfm = (prop_f.w_inf > 1e-9 && sigma_inf_Pinf_tfm2 !== 0) ? (-sigma_inf_Pinf_tfm2) * prop_f.w_inf : 0;
+        
+        return { Md1_tfm, Md2_tfm };
+    }
+
+
+    const sumFiberStress = (fiber, stressSources) => {
+        let totalStress = 0;
+        stressSources.forEach(source => {
+            const axialVal = safeGet(indStresses[source.ax], fiber); // indStresses é global
+            const flexVal = safeGet(indStresses[source.flex], fiber); // indStresses é global
+            const multiplier = source.multiplier !== undefined ? source.multiplier : 1.0;
+            totalStress += (axialVal + flexVal) * multiplier;
+        });
+        return totalStress;
+    };
+    
+    function calculateCombinedStressesAndVerifications(inputs, limits_tfm2) { 
+        const results = [];
+        const eta = inputs.ato_percentage / 100.0;
+
+        // Verificação 0 (ATO: eta * 1.1 * P1o + G1) - Seção Inicial
+        const stress0_inf_kn = sumFiberStress('inf', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'p1o_ax', flex: 'p1o_flex', multiplier: eta * 1.1 } ]);
+        const stress0_sup1_kn = sumFiberStress('sup1', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'p1o_ax', flex: 'p1o_flex', multiplier: eta * 1.1 } ]);
+        results.push({ inf: stress0_inf_kn * KN_M2_TO_TF_M2, sup1: stress0_sup1_kn * KN_M2_TO_TF_M2, sup2: null });
+
+        // Verificação 1 (ATO: 1.1 * (P1o + P2o) + G1) - Seção Inicial
+        const stress1_inf_kn = sumFiberStress('inf', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'p1o_ax', flex: 'p1o_flex', multiplier: 1.1 }, { ax: 'p2o_ax', flex: 'p2o_flex', multiplier: 1.1 } ]);
+        const stress1_sup1_kn = sumFiberStress('sup1', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'p1o_ax', flex: 'p1o_flex', multiplier: 1.1 }, { ax: 'p2o_ax', flex: 'p2o_flex', multiplier: 1.1 } ]);
+        results.push({ inf: stress1_inf_kn * KN_M2_TO_TF_M2, sup1: stress1_sup1_kn * KN_M2_TO_TF_M2, sup2: null });
+
+        // Verificação 2 (Intermediária: P1o + G1 + G2) - Seção Inicial
+        const stress2_inf_kn = sumFiberStress('inf', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'p1o_ax', flex: 'p1o_flex'} ]);
+        const stress2_sup1_kn = sumFiberStress('sup1', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'p1o_ax', flex: 'p1o_flex'} ]);
+        results.push({ inf: stress2_inf_kn * KN_M2_TO_TF_M2, sup1: stress2_sup1_kn * KN_M2_TO_TF_M2, sup2: null });
+
+        // Verificação 3 (Intermediária: G1 + G2 + Po1 + Po2)
+        const stress3_inf_kn = sumFiberStress('inf', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'p1o_ax', flex: 'p1o_flex'}, { ax: 'p2o_ax', flex: 'p2o_flex'} ]);
+        const stress3_sup1_kn = sumFiberStress('sup1', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'p1o_ax', flex: 'p1o_flex'}, { ax: 'p2o_ax', flex: 'p2o_flex'} ]);
+        const stress3_sup2_kn = 0; 
+        results.push({ inf: stress3_inf_kn * KN_M2_TO_TF_M2, sup1: stress3_sup1_kn * KN_M2_TO_TF_M2, sup2: stress3_sup2_kn * KN_M2_TO_TF_M2 });
+
+
+        // Verificação 4 (ELS-F: P1inf + P2inf + G1+G2+G3 + psi1*Q) - Seção Final
+        const stress4_inf_kn = sumFiberStress('inf', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'ng3', flex: 'mg3'}, { ax: 'nq', flex: 'mq', multiplier: inputs.psi1}, { ax: 'p1oo_ax', flex: 'p1oo_flex'}, { ax: 'p2oo_ax', flex: 'p2oo_flex'} ]);
+        const stress4_sup1_kn = sumFiberStress('sup1', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'ng3', flex: 'mg3'}, { ax: 'nq', flex: 'mq', multiplier: inputs.psi1}, { ax: 'p1oo_ax', flex: 'p1oo_flex'}, { ax: 'p2oo_ax', flex: 'p2oo_flex'} ]);
+        const stress4_sup2_kn = sumFiberStress('sup2', [ { ax: 'ng3', flex: 'mg3'}, { ax: 'nq', flex: 'mq', multiplier: inputs.psi1}, { ax: 'p1oo_ax', flex: 'p1oo_flex'}, { ax: 'p2oo_ax', flex: 'p2oo_flex'} ]);
+        results.push({ inf: stress4_inf_kn * KN_M2_TO_TF_M2, sup1: stress4_sup1_kn * KN_M2_TO_TF_M2, sup2: stress4_sup2_kn * KN_M2_TO_TF_M2 });
+
+        // Verificação 5 (ELS-D: P1inf + P2inf + G1+G2+G3 + psi2*Q) - Seção Final
+        const stress5_inf_kn = sumFiberStress('inf', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'ng3', flex: 'mg3'}, { ax: 'nq', flex: 'mq', multiplier: inputs.psi2}, { ax: 'p1oo_ax', flex: 'p1oo_flex'}, { ax: 'p2oo_ax', flex: 'p2oo_flex'} ]);
+        const stress5_sup1_kn = sumFiberStress('sup1', [ { ax: 'ng1', flex: 'mg1'}, { ax: 'ng2', flex: 'mg2'}, { ax: 'ng3', flex: 'mg3'}, { ax: 'nq', flex: 'mq', multiplier: inputs.psi2}, { ax: 'p1oo_ax', flex: 'p1oo_flex'}, { ax: 'p2oo_ax', flex: 'p2oo_flex'} ]);
+        const stress5_sup2_kn = sumFiberStress('sup2', [ { ax: 'ng3', flex: 'mg3'}, { ax: 'nq', flex: 'mq', multiplier: inputs.psi2}, { ax: 'p1oo_ax', flex: 'p1oo_flex'}, { ax: 'p2oo_ax', flex: 'p2oo_flex'} ]);
+        results.push({ inf: stress5_inf_kn * KN_M2_TO_TF_M2, sup1: stress5_sup1_kn * KN_M2_TO_TF_M2, sup2: stress5_sup2_kn * KN_M2_TO_TF_M2 });
+        
+        results.forEach((stress_tfm2, i) => {
+            const limit = limits_tfm2[i];
+            const checkFiber = (stressVal, limitVal) => {
+                if (limitVal === null || stressVal === null || isNaN(stressVal) || isNaN(limitVal)) return true;
+                const tolerance = 1e-2; 
+                if (limitVal >= 0) { 
+                    return stressVal <= limitVal + tolerance;
+                } else { 
+                    return stressVal >= limitVal - tolerance;
+                }
+            };
+            const check_inf = checkFiber(stress_tfm2.inf, limit.inf);
+            const check_sup1 = checkFiber(stress_tfm2.sup1, limit.sup1);
+            const check_sup2 = checkFiber(stress_tfm2.sup2, limit.sup2);
+            stress_tfm2.check = (check_inf && check_sup1 && check_sup2) ? '<span class="verification-ok">OK</span>' : '<span class="verification-fail">FALHA</span>';
+        });
+
+        return results;
+    }
+
+
+    // --- Funções de Atualização da Interface (UI) ---
+    function populatePropertiesTable(properties) {
+        updateElementText('area-inicial', formatNumber(properties.inicial.area, 3));
+        updateElementText('yinf-inicial', formatNumber(properties.inicial.y_inf, 3));
+        updateElementText('ysup-inicial', formatNumber(properties.inicial.y_sup, 3));
+        updateElementText('inercia-inicial', formatNumber(properties.inicial.inertia, 5));
+        updateElementText('winf-inicial', formatNumber(properties.inicial.w_inf, 4));
+        updateElementText('wsup1-inicial', formatNumber(properties.inicial.w_sup1, 4));
+        updateElementText('wsup2-inicial', formatNumber(properties.inicial.w_sup2, 4, true)); 
+        updateElementText('area-final', formatNumber(properties.final.area, 3));
+        updateElementText('yinf-final', formatNumber(properties.final.y_inf, 3));
+        updateElementText('ysup-final', formatNumber(properties.final.y_sup, 3));
+        updateElementText('inercia-final', formatNumber(properties.final.inertia, 5));
+        updateElementText('winf-final', formatNumber(properties.final.w_inf, 4));
+        updateElementText('wsup1-final', formatNumber(properties.final.w_sup1, 4));
+        updateElementText('wsup2-final', formatNumber(properties.final.w_sup2, 4));
+    }
+
+    function populateLimitsTable(limits) {
+        limits.forEach((limit, i) => {
+            updateElementText(`limit-inf-${i}`, formatNumber(limit.inf, 0));
+            updateElementText(`limit-sup1-${i}`, formatNumber(limit.sup1, 0));
+            updateElementText(`limit-sup2-${i}`, formatNumber(limit.sup2, 0));
+        });
+    }
+
+    function populateCalculatedStressesTable(combinedStresses) {
+        combinedStresses.forEach((stress, i) => {
+            updateElementText(`stress-inf-${i}`, formatNumber(stress.inf, 0));
+            updateElementText(`stress-sup1-${i}`, formatNumber(stress.sup1, 0));
+            updateElementText(`stress-sup2-${i}`, formatNumber(stress.sup2, 0));
+            getElement(`check-${i}`).innerHTML = stress.check;
+        });
+    }
+
+    function populateIndividualStressesTable(individualStresses_knm2_arg) { 
+        const tbody = getElement('individual-stresses-tbody');
+        tbody.innerHTML = '';
+        const actionOrderAndNames = [
+            { key_ax: 'p1o_ax', key_flex: 'p1o_flex', name_ax: 'N<sub>p1o</sub>', name_flex: 'M<sub>p1o</sub>' },
+            { key_ax: 'p1oo_ax', key_flex: 'p1oo_flex', name_ax: 'N<sub>p1∞</sub>', name_flex: 'M<sub>p1∞</sub>' },
+            { key_ax: 'p2o_ax', key_flex: 'p2o_flex', name_ax: 'N<sub>p2o</sub>', name_flex: 'M<sub>p2o</sub>' },
+            { key_ax: 'p2oo_ax', key_flex: 'p2oo_flex', name_ax: 'N<sub>p2∞</sub>', name_flex: 'M<sub>p2∞</sub>' },
+            { key_ax: 'ng1', key_flex: 'mg1', name_ax: 'N<sub>g1</sub>', name_flex: 'M<sub>g1</sub>' },
+            { key_ax: 'ng2', key_flex: 'mg2', name_ax: 'N<sub>g2</sub>', name_flex: 'M<sub>g2</sub>' },
+            { key_ax: 'ng3', key_flex: 'mg3', name_ax: 'N<sub>g3</sub>', name_flex: 'M<sub>g3</sub>' },
+            { key_ax: 'nq', key_flex: 'mq', name_ax: 'N<sub>q</sub>', name_flex: 'M<sub>q</sub>' }
+        ];
+        actionOrderAndNames.forEach(action => {
+            const addRow = (name, stressObj_knm2) => {
+                if (!stressObj_knm2) return; 
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td class="table-cell font-medium">${name}</td>
+                    <td class="table-cell text-right">${formatNumber(stressObj_knm2.inf !== null ? stressObj_knm2.inf * KN_M2_TO_TF_M2 : null, 0)}</td>
+                    <td class="table-cell text-right">${formatNumber(stressObj_knm2.sup1 !== null ? stressObj_knm2.sup1 * KN_M2_TO_TF_M2 : null, 0)}</td>
+                    <td class="table-cell text-right">${formatNumber(stressObj_knm2.sup2 !== null ? stressObj_knm2.sup2 * KN_M2_TO_TF_M2 : null, 0)}</td>`;
+            };
+            addRow(action.name_ax, individualStresses_knm2_arg[action.key_ax]);
+            addRow(action.name_flex, individualStresses_knm2_arg[action.key_flex]);
+        });
+    }
+    
+    function updateCalculatedPrestressFieldsInActionsTab(prestressMoments, prestressForces) {
+        updateElementValue('mp1o', formatNumber(prestressMoments.Mp1o, 1));
+        updateElementValue('mp2o', formatNumber(prestressMoments.Mp2o, 1));
+        updateElementValue('mp1oo', formatNumber(prestressMoments.Mp1oo, 1));
+        updateElementValue('mp2oo', formatNumber(prestressMoments.Mp2oo, 1));
+        updateElementValue('np1o', formatNumber(prestressForces.Np1o, 1));
+        updateElementValue('np2o', formatNumber(prestressForces.Np2o, 1));
+        updateElementValue('np1oo', formatNumber(prestressForces.Np1oo, 1));
+        updateElementValue('np2oo', formatNumber(prestressForces.Np2oo, 1));
+    }
+
+    function populateUIWithResults(properties, limits, combinedStresses, individualStresses_arg, prestressMoments_tfm, prestressForces_tf, decompressionMoments_tfm) {
+        populatePropertiesTable(properties);
+        populateLimitsTable(limits);
+        populateCalculatedStressesTable(combinedStresses);
+        populateIndividualStressesTable(individualStresses_arg); 
+        updateCalculatedPrestressFieldsInActionsTab(prestressMoments_tfm, prestressForces_tf);
+        
+        if (decompressionMoments_tfm) {
+            updateElementText('result-md-inicial', formatNumber(decompressionMoments_tfm.Md1_tfm, 1));
+            updateElementText('result-md-final', formatNumber(decompressionMoments_tfm.Md2_tfm, 1));
+        } else {
+            updateElementText('result-md-inicial', '-');
+            updateElementText('result-md-final', '-');
+        }
+    }
+
+    function updatePrestressForcesAndMomentsInActionsUI() {
+        try {
+            const inputs = getInputs(); 
+            const properties = calculateGeometricProperties(inputs.geometry, inputs.bf1, inputs.hf1, inputs.bf2, inputs.hf2);
+            const prestressForces = calculatePrestressForces(inputs); 
+            const prestressMoments = calculatePrestressMoments(inputs, properties); 
+            updateCalculatedPrestressFieldsInActionsTab(prestressMoments, prestressForces);
+        } catch (error) {
+            console.error("Erro ao atualizar forças/momentos de protensão na UI da aba Ações:", error);
+            ['mp1o', 'mp2o', 'mp1oo', 'mp2oo', 'np1o', 'np2o', 'np1oo', 'np2oo'].forEach(id => updateElementValue(id, '-'));
+        }
+    }
+
+    // --- Visualização da Seção (SVG) ---
+    function drawSection() {
+        const inputs = getInputs();
+        try {
+            const props = calculateGeometricProperties(inputs.geometry, inputs.bf1, inputs.hf1, inputs.bf2, inputs.hf2);
+            const svgWidth = 300, svgHeight = 250, padding = 20; 
+            const maxGeoWidth = Math.max( ...inputs.geometry.map(el => Math.max(el.binf, el.bsup)), inputs.bf1, inputs.bf2, 0.1 ); 
+            const totalHeight = props.final.h_total;
+
+            if (maxGeoWidth <= 1e-9 || totalHeight <= 1e-9 || !isFinite(maxGeoWidth) || !isFinite(totalHeight)) {
+                visualizationDiv.innerHTML = '<span class="text-sm italic">Dimensões inválidas para desenho.</span>'; return;
+            }
+
+            const scaleX = (svgWidth - 2 * padding) / maxGeoWidth;
+            const scaleY = (svgHeight - 2 * padding) / totalHeight;
+            const scale = Math.min(scaleX, scaleY) * 0.9; 
+
+            const scaledTotalWidth = maxGeoWidth * scale;
+            const offsetX = (svgWidth - scaledTotalWidth) / 2; 
+            const offsetY = svgHeight - padding; 
+
+            let svgContent = `<svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="${svgWidth}" height="${svgHeight}" fill="#f9fafb"/>`;
+            let currentY_base_drawing_m = 0; 
+
+            inputs.geometry.forEach((el, index) => {
+                if (el.h <= 0) return;
+                const y_bottom_el_m = currentY_base_drawing_m;
+                const y_top_el_m = currentY_base_drawing_m + el.h;
+                const y_bottom_el_svg = offsetY - y_bottom_el_m * scale;
+                const y_top_el_svg = offsetY - y_top_el_m * scale;
+                const x_offset_inf_el = (maxGeoWidth - el.binf) / 2; 
+                const x_offset_sup_el = (maxGeoWidth - el.bsup) / 2;
+
+                const points = `
+                    ${offsetX + x_offset_inf_el * scale},${y_bottom_el_svg}
+                    ${offsetX + (x_offset_inf_el + el.binf) * scale},${y_bottom_el_svg}
+                    ${offsetX + (x_offset_sup_el + el.bsup) * scale},${y_top_el_svg}
+                    ${offsetX + x_offset_sup_el * scale},${y_top_el_svg}
+                `;
+                svgContent += `<polygon points="${points.trim()}" fill="#d1d5db" stroke="#6b7280" stroke-width="0.5"/>`;
+                svgContent += `<text x="${padding / 2}" y="${(y_top_el_svg + y_bottom_el_svg) / 2}" class="element-number">${index + 1}</text>`;
+                currentY_base_drawing_m += el.h;
             });
-            return { combined: results, individual: individualStresses };
+
+            const drawLayer = (h_layer, b_layer, y_base_layer_m, color) => {
+                if (h_layer <= 0 || b_layer <= 0) return;
+                const y_bottom_layer_m = y_base_layer_m;
+                const y_top_layer_m = y_base_layer_m + h_layer;
+                const y_bottom_layer_svg = offsetY - y_bottom_layer_m * scale;
+                const y_top_layer_svg = offsetY - y_top_layer_m * scale;
+                const x_offset_layer = (maxGeoWidth - b_layer) / 2;
+                svgContent += `<rect x="${offsetX + x_offset_layer * scale}" y="${y_top_layer_svg}" width="${b_layer * scale}" height="${h_layer * scale}" fill="${color}" stroke="#6b7280" stroke-width="0.5"/>`;
+            };
+            drawLayer(inputs.hf1, inputs.bf1, props.inicial.h_total, "#e5e7eb"); 
+            drawLayer(inputs.hf2, inputs.bf2, props.inicial.h_total + inputs.hf1, "#f3f4f6"); 
+
+            const cg_radius = 2.5;
+            const cg_center_x_svg = svgWidth / 2; 
+            const drawCGCable = (cg_y_m, num_cables, color, label) => {
+                if (num_cables > 0 && cg_y_m > 0 && cg_y_m <= totalHeight) {
+                    const cg_y_svg = offsetY - cg_y_m * scale;
+                    svgContent += `<circle cx="${cg_center_x_svg}" cy="${cg_y_svg}" r="${cg_radius}" fill="none" stroke="${color}" stroke-width="1"/>`;
+                    svgContent += `<text x="${cg_center_x_svg + cg_radius + 2}" y="${cg_y_svg + cg_radius / 2}" fill="${color}" class="cg-label" text-anchor="start" dominant-baseline="middle">${label}</text>`;
+                }
+            };
+            drawCGCable(inputs.cg_cables1, inputs.num_cables1, "red", "P1");
+            drawCGCable(inputs.cg_cables2, inputs.num_cables2, "blue", "P2");
+
+            svgContent += '</svg>';
+            visualizationDiv.innerHTML = svgContent;
+        } catch (error) {
+            console.error("Erro ao desenhar seção:", error);
+            visualizationDiv.innerHTML = '<span class="text-sm italic text-red-600">Erro ao desenhar. Verifique os dados.</span>';
         }
+    }
 
+    // --- Função Principal de Cálculo e Orquestração ---
+    function performCalculations() {
+        try {
+            const inputs = getInputs(); 
+            window.currentInputs = inputs; // Torna 'inputs' acessível globalmente para calculateDecompressionMoments
 
-        function updateUI(properties, limits, stressResults, prestressMoments, prestressForces) {
+            const properties = calculateGeometricProperties(inputs.geometry, inputs.bf1, inputs.hf1, inputs.bf2, inputs.hf2);
+            const limitStresses_tfm2 = calculateLimitStresses(inputs);
+            
+            const prestressForces_tf = calculatePrestressForces(inputs); 
+            const prestressMoments_tfm = calculatePrestressMoments(inputs, properties); 
+
+            const localIndStresses = calculateIndividualStresses(inputs, properties); 
+            
+            const decompressionMoments_tfm = calculateDecompressionMoments(inputs, properties, localIndStresses); 
+            
+            const combinedStresses_tfm2 = calculateCombinedStressesAndVerifications(inputs, limitStresses_tfm2); 
+
+            populateUIWithResults(properties, limitStresses_tfm2, combinedStresses_tfm2, localIndStresses, prestressMoments_tfm, prestressForces_tf, decompressionMoments_tfm);
+            
+            drawSection(); 
             resultsSection.classList.remove('hidden');
-            const format = (value, decimals = 3) => (value !== null && !isNaN(value)) ? value.toFixed(decimals) : '-';
-            const formatInt = (value) => (value !== null && !isNaN(value)) ? Math.round(value) : '-'; // Para tf/m2
-            const knm2_to_tfm2 = 1 / 9.80665;
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
 
-            document.getElementById('area-inicial').textContent = format(properties.inicial.area); document.getElementById('yinf-inicial').textContent = format(properties.inicial.y_inf); document.getElementById('ysup-inicial').textContent = format(properties.inicial.y_sup); document.getElementById('inercia-inicial').textContent = format(properties.inicial.inertia, 5); document.getElementById('winf-inicial').textContent = format(properties.inicial.w_inf, 4); document.getElementById('wsup1-inicial').textContent = format(properties.inicial.w_sup1, 4); document.getElementById('wsup2-inicial').textContent = format(properties.inicial.w_sup2, 4);
-            document.getElementById('area-final').textContent = format(properties.final.area); document.getElementById('yinf-final').textContent = format(properties.final.y_inf); document.getElementById('ysup-final').textContent = format(properties.final.y_sup); document.getElementById('inercia-final').textContent = format(properties.final.inertia, 5); document.getElementById('winf-final').textContent = format(properties.final.w_inf, 4); document.getElementById('wsup1-final').textContent = format(properties.final.w_sup1, 4); document.getElementById('wsup2-final').textContent = format(properties.final.w_sup2, 4);
-
-            limits.forEach((limit, i) => { document.getElementById(`limit-inf-${i}`).textContent = formatInt(limit.inf); document.getElementById(`limit-sup1-${i}`).textContent = formatInt(limit.sup1); document.getElementById(`limit-sup2-${i}`).textContent = formatInt(limit.sup2); });
-            stressResults.combined.forEach((stress, i) => { document.getElementById(`stress-inf-${i}`).textContent = formatInt(stress.inf); document.getElementById(`stress-sup1-${i}`).textContent = formatInt(stress.sup1); document.getElementById(`stress-sup2-${i}`).textContent = formatInt(stress.sup2); document.getElementById(`check-${i}`).innerHTML = stress.check; });
-
-            const indStresses = stressResults.individual; const indStressBody = document.getElementById('individual-stresses-tbody'); indStressBody.innerHTML = '';
-             const addIndStressRow = (actionKey, stressObj_knm2) => {
-                 const row = indStressBody.insertRow();
-                 let actionName = actionKey; let suffix = '';
-                 if ( actionKey.endsWith('_ax') ) { actionKey = actionKey.slice(0, -3); suffix = ' (Axial)'; }
-                 if ( actionKey.endsWith('_flex') ) { actionKey = actionKey.slice(0, -5); suffix = ' (Flexão)'; }
-                  const first = actionKey.charAt(0).toUpperCase(); const rest  = actionKey.slice(1); actionName = `${first}<sub>${rest}</sub>${suffix}`;
-
-                 row.innerHTML = `
-                     <td class="table-cell font-medium">${actionName}</td>
-                     <td class="table-cell text-right">${formatInt(stressObj_knm2.inf !== null ? stressObj_knm2.inf * knm2_to_tfm2 : null)}</td>
-                     <td class="table-cell text-right">${formatInt(stressObj_knm2.sup1 !== null ? stressObj_knm2.sup1 * knm2_to_tfm2 : null)}</td>
-                     <td class="table-cell text-right">${formatInt(stressObj_knm2.sup2 !== null ? stressObj_knm2.sup2 * knm2_to_tfm2 : null)}</td>
-                 `;
-             };
-            Object.keys(indStresses).sort().forEach(key => { addIndStressRow(key, indStresses[key]); });
-
-            document.getElementById('mp1o').value = formatInt(prestressMoments.Mp1o); document.getElementById('mp2o').value = formatInt(prestressMoments.Mp2o); document.getElementById('mp1oo').value = formatInt(prestressMoments.Mp1oo); document.getElementById('mp2oo').value = formatInt(prestressMoments.Mp2oo);
-            document.getElementById('np1o').value = formatInt(prestressForces.Np1o); document.getElementById('np2o').value = formatInt(prestressForces.Np2o); document.getElementById('np1oo').value = formatInt(prestressForces.Np1oo); document.getElementById('np2oo').value = formatInt(prestressForces.Np2oo);
+        } catch (error) {
+            console.error("Erro nos cálculos:", error, error.stack);
+            resultsSection.classList.add('hidden');
+            visualizationDiv.innerHTML = '<span class="text-sm italic text-red-600">Erro ao calcular. Verifique console.</span>';
+            const errorBox = document.createElement('div');
+            errorBox.style.cssText = 'position:fixed; left:50%; top:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid red; border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.1); z-index:1000; max-width: 90%; text-align: left;';
+            errorBox.innerHTML = `<p style="color: red; font-weight: bold; margin-bottom: 10px;">Erro nos Cálculos</p>
+                                <p>Ocorreu um erro durante o processamento. Verifique se todos os dados de entrada estão corretos e tente novamente. Para mais detalhes, verifique o console do navegador (geralmente acessível com F12).</p>
+                                <p style="font-size:0.8em; margin-top:5px; color: #555;">Detalhe técnico: ${error.message}</p>
+                                <button onclick="this.parentElement.remove()" style="margin-top: 15px; padding: 8px 16px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; display: block; margin-left: auto; margin-right: auto;">Fechar</button>`;
+            document.body.appendChild(errorBox);
         }
+    }
 
-        function updatePrestressMomentsUI() {
-             try {
-                 const inputs = getInputs();
-                 const properties = calculateGeometricProperties(inputs.geometry, inputs.bf1, inputs.hf1, inputs.bf2, inputs.hf2);
-                 const prestressMoments = calculatePrestressMoments(inputs, properties);
-                 const prestressForces = calculatePrestressForces(inputs);
-                 const formatInt = (value) => (value !== null && !isNaN(value)) ? Math.round(value) : '-';
-                 document.getElementById('mp1o').value = formatInt(prestressMoments.Mp1o); document.getElementById('mp2o').value = formatInt(prestressMoments.Mp2o); document.getElementById('mp1oo').value = formatInt(prestressMoments.Mp1oo); document.getElementById('mp2oo').value = formatInt(prestressMoments.Mp2oo);
-                 document.getElementById('np1o').value = formatInt(prestressForces.Np1o); document.getElementById('np2o').value = formatInt(prestressForces.Np2o); document.getElementById('np1oo').value = formatInt(prestressForces.Np1oo); document.getElementById('np2oo').value = formatInt(prestressForces.Np2oo);
-             } catch (error) {
-                 console.error("Erro ao calcular momentos/forças de protensão:", error);
-                 document.getElementById('mp1o').value = '-'; document.getElementById('mp2o').value = '-'; document.getElementById('mp1oo').value = '-'; document.getElementById('mp2oo').value = '-';
-                 document.getElementById('np1o').value = '-'; document.getElementById('np2o').value = '-'; document.getElementById('np1oo').value = '-'; document.getElementById('np2oo').value = '-';
-             }
-         }
+    // --- Inicialização da Calculadora ---
+    function initializeCalculator() {
+        geometryTbody = getElement('geometry-tbody');
+        addRowBtn = getElement('add-row-btn');
+        removeRowBtn = getElement('remove-row-btn');
+        calculateBtn = getElement('calculate-btn');
+        resultsSection = getElement('results-section');
+        visualizationDiv = getElement('section-visualization');
+        tabButtons = querySelectorAll('.tab-button');
+        stepContents = [getElement('tab-content-geometria'), getElement('tab-content-materiais'), getElement('tab-content-acoes')];
+        prevBtn = getElement('prev-btn');
+        nextBtn = getElement('next-btn');
 
-        function drawSection() {
-             const inputs = getInputs();
-             try {
-                 const props = calculateGeometricProperties(inputs.geometry, inputs.bf1, inputs.hf1, inputs.bf2, inputs.hf2);
-                 const svgWidth = 300; const svgHeight = 250; const padding = 20;
-                 const maxGeoWidth = Math.max( ...inputs.geometry.map(el => Math.max(el.binf, el.bsup)), inputs.bf1, inputs.bf2, 0.1 );
-                 const totalHeight = props.final.h_total;
-                 if (maxGeoWidth <= 0 || totalHeight <= 0 || !isFinite(maxGeoWidth) || !isFinite(totalHeight)) {
-                     visualizationDiv.innerHTML = '<span class="text-sm italic">Dimensões inválidas</span>'; return;
-                 }
-                 const scaleX = (svgWidth - 2 * padding) / maxGeoWidth; const scaleY = (svgHeight - 2 * padding) / totalHeight; const scale = Math.min(scaleX, scaleY) * 0.9;
-                 const scaledWidth = maxGeoWidth * scale; const scaledHeight = totalHeight * scale;
-                 const offsetX = (svgWidth - scaledWidth) / 2; const offsetY = svgHeight - padding;
-                 let svgContent = `<svg width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="${svgWidth}" height="${svgHeight}" fill="#f9fafb"/>`;
-                 let currentY_base = 0;
-                 inputs.geometry.forEach((el, index) => {
-                     const y1_abs = currentY_base; const y2_abs = currentY_base + el.h;
-                     const y1_svg = offsetY - y1_abs * scale; const y2_svg = offsetY - y2_abs * scale;
-                     const x1_inf = offsetX + (maxGeoWidth - el.binf) / 2 * scale; const x1_sup = offsetX + (maxGeoWidth - el.bsup) / 2 * scale;
-                     const x2_inf = x1_inf + el.binf * scale; const x2_sup = x1_sup + el.bsup * scale;
-                     svgContent += `<polygon points="${x1_inf},${y1_svg} ${x2_inf},${y1_svg} ${x2_sup},${y2_svg} ${x1_sup},${y2_svg}" fill="#d1d5db" stroke="#6b7280" stroke-width="0.5"/>`;
-                     const numberX = padding / 2; const centroidY = (y1_svg + y2_svg) / 2;
-                     svgContent += `<text x="${numberX}" y="${centroidY}" class="element-number">${index + 1}</text>`;
-                     currentY_base += el.h;
-                 });
-                 if (inputs.hf1 > 0 && inputs.bf1 > 0) {
-                     const y1_l1_abs = props.inicial.h_total; const y2_l1_abs = y1_l1_abs + inputs.hf1;
-                     const y1_l1_svg = offsetY - y1_l1_abs * scale; const y2_l1_svg = offsetY - y2_l1_abs * scale;
-                     const x1_l1 = offsetX + (maxGeoWidth - inputs.bf1) / 2 * scale;
-                     svgContent += `<rect x="${x1_l1}" y="${y2_l1_svg}" width="${inputs.bf1 * scale}" height="${inputs.hf1 * scale}" fill="#e5e7eb" stroke="#6b7280" stroke-width="0.5"/>`;
-                 }
-                 if (inputs.hf2 > 0 && inputs.bf2 > 0) {
-                     const y1_l2_abs = props.inicial.h_total + inputs.hf1; const y2_l2_abs = y1_l2_abs + inputs.hf2;
-                     const y1_l2_svg = offsetY - y1_l2_abs * scale; const y2_l2_svg = offsetY - y2_l2_abs * scale;
-                     const x1_l2 = offsetX + (maxGeoWidth - inputs.bf2) / 2 * scale;
-                     svgContent += `<rect x="${x1_l2}" y="${y2_l2_svg}" width="${inputs.bf2 * scale}" height="${inputs.hf2 * scale}" fill="#f3f4f6" stroke="#6b7280" stroke-width="0.5"/>`;
-                 }
-                 const cg_radius = 3; const cg_center_x = svgWidth / 2; const cgLabelX = svgWidth - padding / 2;
-                 if (inputs.num_cables1 > 0 && inputs.cg_cables1 > 0 && inputs.cg_cables1 <= totalHeight) {
-                     const cg1_y_svg = offsetY - inputs.cg_cables1 * scale;
-                     svgContent += `<circle cx="${cg_center_x}" cy="${cg1_y_svg}" r="${cg_radius}" fill="none" stroke="red" stroke-width="1.5"/>`;
-                     svgContent += `<text x="${cgLabelX}" y="${cg1_y_svg + 4}" fill="red" class="cg-label" text-anchor="end">CG P1</text>`;
-                 }
-                 if (inputs.num_cables2 > 0 && inputs.cg_cables2 > 0 && inputs.cg_cables2 <= totalHeight) {
-                     const cg2_y_svg = offsetY - inputs.cg_cables2 * scale;
-                     svgContent += `<circle cx="${cg_center_x}" cy="${cg2_y_svg}" r="${cg_radius}" fill="none" stroke="blue" stroke-width="1.5"/>`;
-                     svgContent += `<text x="${cgLabelX}" y="${cg2_y_svg + 4}" fill="blue" class="cg-label" text-anchor="end">CG P2</text>`;
-                 }
-                 svgContent += '</svg>';
-                 visualizationDiv.innerHTML = svgContent;
-             } catch (error) {
-                 console.error("Erro ao desenhar seção:", error);
-                 visualizationDiv.innerHTML = '<span class="text-sm italic text-red-600">Erro no desenho</span>';
-             }
-         }
+        geometryTbody.innerHTML = '';
+        addGeometryRow(0.780, 0.780, 0.350); addGeometryRow(0.780, 0.220, 0.280);
+        addGeometryRow(0.220, 0.220, 1.620); addGeometryRow(0.220, 1.300, 0.030);
+        addGeometryRow(1.300, 1.300, 0.120);
 
-        function performCalculations() {
-             try {
-                 const inputs = getInputs();
-                 const properties = calculateGeometricProperties(inputs.geometry, inputs.bf1, inputs.hf1, inputs.bf2, inputs.hf2);
-                 const limits = calculateLimitStresses(inputs); // Passa todos os inputs
-                 const prestressMoments = calculatePrestressMoments(inputs, properties);
-                 const prestressForces = calculatePrestressForces(inputs);
-                 const stressResults = calculateStressesAndVerifications(inputs, properties, limits);
-                 updateUI(properties, limits, stressResults, prestressMoments, prestressForces);
-                 drawSection(); // Redesenhar caso algo mude que afete a visualização (raro aqui, mas bom manter)
-                 resultsSection.classList.remove('hidden');
-                 resultsSection.scrollIntoView({ behavior: 'smooth' });
-             } catch (error) {
-                 console.error("Erro nos cálculos:", error);
-                 resultsSection.classList.add('hidden');
-                 visualizationDiv.innerHTML = '<span class="text-sm italic text-red-600">Erro nos cálculos</span>';
-                 // Replace alert with a more user-friendly message display if possible
-                 // For now, keeping alert for direct feedback on errors during development/testing
-                 // In a production environment, this should be a custom modal or message area.
-                 const userFriendlyMessage = "Ocorreu um erro durante os cálculos. Verifique os valores de entrada. Detalhes técnicos foram registrados no console do navegador.";
-                 // For a more robust solution, you might display the error in a dedicated UI element.
-                 // Example: document.getElementById('error-message-area').textContent = userFriendlyMessage;
-                 // For now, using a simple alert for immediate feedback.
-                 if (typeof alert !== 'undefined') { // Check if alert is available (it is in browsers)
-                    alert(userFriendlyMessage + "\n\nDetalhes: " + error.message + (error.stack ? "\n" + error.stack.substring(0, 300) + "..." : ""));
-                 }
-             }
-         }
+        updateElementValue('bf1', "1.00"); updateElementValue('hf1', "0.11");
+        updateElementValue('bf2', "4.250"); updateElementValue('hf2', "0.14");
+        updateElementValue('fckj_ato', "3500"); updateElementValue('fckj_servico', "3500"); 
+        updateElementValue('fck28', "4500"); updateElementValue('alpha', "1.2");
+        updateElementValue('cg_cables1', "0.209"); updateElementValue('num_cables1', "46");
+        updateElementValue('po1', "21.1"); updateElementValue('pinf1', "17.8");
+        updateElementValue('ato_percentage', "100");
+        updateElementValue('cg_cables2', "0.0"); updateElementValue('num_cables2', "0");
+        updateElementValue('po2', "0.0"); updateElementValue('pinf2', "0.0");
+        updateElementValue('mg1', "377.0"); updateElementValue('mg2', "412.0");
+        updateElementValue('mg3', "203.0"); updateElementValue('mq', "557.0");
+        updateElementValue('psi1', "0.50"); updateElementValue('psi2', "0.30");
+        updateElementValue('ng1', "0.0"); updateElementValue('ng2', "0.0");
+        updateElementValue('ng3', "0.0"); updateElementValue('nq', "0.0");
 
-        document.addEventListener('DOMContentLoaded', initializeCalculator);
-    </script>
+        addRowBtn.addEventListener('click', () => { addGeometryRow(); updatePrestressForcesAndMomentsInActionsUI(); drawSection(); });
+        removeRowBtn.addEventListener('click', removeGeometryRow); 
+        calculateBtn.addEventListener('click', performCalculations);
 
+        const inputsForDynamicUpdate = document.querySelectorAll('.prestress-input, #bf1, #hf1, #bf2, #hf2');
+        inputsForDynamicUpdate.forEach(input => {
+            input.addEventListener('input', () => {
+                updatePrestressForcesAndMomentsInActionsUI();
+                drawSection(); 
+            });
+        });
+        
+        updatePrestressForcesAndMomentsInActionsUI();
+        drawSection();
+        goToStep(1); 
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeCalculator);
+</script>
 </body>
 </html>
