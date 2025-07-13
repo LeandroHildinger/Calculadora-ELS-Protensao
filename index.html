@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora ELS - Elemento Protendido (Superposição de Diagramas)</title>
+    <title>Calculadora ELS - Elemento Protendido</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Estilos gerais e de input */
@@ -54,7 +54,7 @@
         #stress-superposition-diagrams-container {
             display: flex; 
             flex-direction: row; 
-            align-items: center; 
+            align-items: flex-end; /* Alinha os diagramas pela base */
             gap: 8px; 
             overflow-x: auto;
             padding: 1rem; 
@@ -71,6 +71,7 @@
             font-weight: bold;
             margin: 0 8px; 
             flex-shrink: 0; 
+            align-self: center; /* Mantém operadores centralizados verticalmente */
         }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -636,8 +637,8 @@
         const y_cg_laje2 = h_total_inicial + hf1 + hf2 / 2; 
 
         const static_moment_y_final = static_moment_y_inicial +
-                                    (area_laje1 * y_cg_laje1) +
-                                    (area_laje2 * y_cg_laje2);
+                                      (area_laje1 * y_cg_laje1) +
+                                      (area_laje2 * y_cg_laje2);
         const y_inf_final = area_final > 1e-9 ? static_moment_y_final / area_final : 0;
         const h_total_final = h_total_inicial + hf1 + hf2;
         const y_sup_final = h_total_final - y_inf_final; 
@@ -812,7 +813,7 @@
         indStressesLocal.p1oo_flex = {
             inf:  -flexStress(P0_1_kn * exc_1_i, prop_i.w_inf)   + flexStress(d_P1_kn * exc_1_f, prop_f.w_inf),
             sup1: +flexStress(P0_1_kn * exc_1_i, prop_i.w_sup1) - flexStress(d_P1_kn * exc_1_f, prop_f.w_sup1), 
-            sup2:                                                - flexStress(d_P1_kn * exc_1_f, prop_f.w_sup2)  
+            sup2:                                                 - flexStress(d_P1_kn * exc_1_f, prop_f.w_sup2)  
         };
          if (inputs.num_cables2 > 0) {
             const P0_2_kn = inputs.Poo2_total_kn;
@@ -829,7 +830,7 @@
             indStressesLocal.p2oo_flex = {
                 inf:  -flexStress(P0_2_kn * exc_2_i, prop_i.w_inf)  + flexStress(d_P2_kn * exc_2_f, prop_f.w_inf),
                 sup1: +flexStress(P0_2_kn * exc_2_i, prop_i.w_sup1) - flexStress(d_P2_kn * exc_2_f, prop_f.w_sup1),
-                sup2:                                                 - flexStress(d_P2_kn * exc_2_f, prop_f.w_sup2)
+                sup2:                                                  - flexStress(d_P2_kn * exc_2_f, prop_f.w_sup2)
             };
         } else {
             indStressesLocal.p2oo_ax = { inf: 0, sup1: 0, sup2: 0 };
@@ -890,7 +891,7 @@
                 inf: stresses_kn.inf * KN_M2_TO_TF_M2,
                 sup1: stresses_kn.sup1 * KN_M2_TO_TF_M2,
                 sup2: (stresses_kn.sup2 === null || (comboDef.resultStressFiberSupKey !== 'sup2' && comboDef.resultDiagramSectionHeightKey === 'inicial.h_total' )) ? null : stresses_kn.sup2 * KN_M2_TO_TF_M2,
-                 // Adicionado para referência na tabela, pode ser diferente do usado no diagrama resultante se a comb. 3 for ajustada
+                // Adicionado para referência na tabela, pode ser diferente do usado no diagrama resultante se a comb. 3 for ajustada
                 actualSup1ForTable: stresses_kn.sup1 * KN_M2_TO_TF_M2,
                 actualSup2ForTable: stresses_kn.sup2 === null ? null : stresses_kn.sup2 * KN_M2_TO_TF_M2
             });
@@ -969,14 +970,6 @@
         actionOrderAndNames.forEach(action => {
             const stressObj_knm2 = individualStresses_knm2_arg[action.key];
             if (!stressObj_knm2) return; 
-
-            // REMOVIDAS as condições que ocultavam as linhas para p2o e delta_p2
-            // if (action.key.startsWith('delta_p2') && (!inputs || inputs.num_cables2 === 0)) {
-            //     return;
-            // }
-            // if (action.key.startsWith('p2o_') && (!inputs || inputs.num_cables2 === 0)) {
-            //     return;
-            // }
 
             const row = tbody.insertRow();
             row.innerHTML = `
@@ -1107,23 +1100,24 @@
     }
 
     /**
-     * Desenha um diagrama de tensões com até 3 fibras, adaptado da função fornecida pelo usuário.
-     * @param {number[]} sigma_tfm2_array - Array de tensões [σinf, σsup1, σsup2] em tf/m². σsup1 e σsup2 podem ser null.
-     * @param {number} ySup1_m - Altura em metros da fibra sup1 (topo da viga) a partir da base da seção.
-     * @param {number} hTotalComponent_m - Altura total da seção para este componente do diagrama (pode ser h_viga ou h_total_final).
+     * [CORRIGIDO] Desenha um diagrama de tensões com altura proporcional e rótulos de valores.
+     * @param {number[]} sigma_tfm2_array - Array de tensões [σinf, σsup1, σsup2].
+     * @param {number} ySup1_m - Altura da fibra sup1 (topo da viga) a partir da base.
+     * @param {number} hTotalComponent_m - Altura real deste componente do diagrama.
+     * @param {number} hMax_m - Altura máxima de referência para toda a sequência de diagramas.
      * @param {string} title - Título do diagrama.
-     * @param {number} globalSigmaRef_tfm2 - Tensão de referência global para a combinação (para escala proporcional).
+     * @param {number} globalSigmaRef_tfm2 - Tensão de referência global para escala horizontal.
+     * @param {number | null} [sigma_interface_slab_tfm2=null] - Tensão na interface viga/laje para criar o "dente".
      */
-    function drawStressDiagramEnhanced(sigma_tfm2_array, ySup1_m, hTotalComponent_m, title, globalSigmaRef_tfm2) {
+    function drawStressDiagramEnhanced(sigma_tfm2_array, ySup1_m, hTotalComponent_m, hMax_m, title, globalSigmaRef_tfm2, sigma_interface_slab_tfm2 = null) {
         const [s_inf, s_sup1, s_sup2_raw] = sigma_tfm2_array;
         
-        // Trata null/NaN como 0 para cálculos internos do desenho, mas preserva null para lógica de rótulos
         const ds_inf = (s_inf === null || isNaN(s_inf)) ? 0 : s_inf;
         const ds_sup1 = (s_sup1 === null || isNaN(s_sup1)) ? 0 : s_sup1;
-        let ds_sup2 = (s_sup2_raw === null || isNaN(s_sup2_raw)) ? ds_sup1 : s_sup2_raw; // Se sup2 não existe, usa sup1 para fechar o diagrama
+        let ds_sup2 = (s_sup2_raw === null || isNaN(s_sup2_raw)) ? ds_sup1 : s_sup2_raw;
 
-        // Se a altura do componente é apenas a da viga, sup2 é igual a sup1 para o desenho do polígono
-        if (hTotalComponent_m <= ySup1_m + 1e-3) {
+        const isCompositeDiagram = hTotalComponent_m > ySup1_m + 1e-3;
+        if (!isCompositeDiagram) {
             ds_sup2 = ds_sup1;
         }
 
@@ -1132,27 +1126,33 @@
         const Xc = W / 2;
 
         const yInf_px = H - pad.bottom; 
-        const ySup2_px = pad.top;
         const diagramHeight_px = H - pad.top - pad.bottom;
-        const ySup1_px = yInf_px - (ySup1_m / hTotalComponent_m) * diagramHeight_px;
+        
+        const ySup_component_top_px = yInf_px - (hTotalComponent_m / hMax_m) * diagramHeight_px;
+        const ySup1_interface_px = yInf_px - (ySup1_m / hMax_m) * diagramHeight_px;
         
         const scale = globalSigmaRef_tfm2 > 1e-6 ? (W - pad.left - pad.right) / 2 / globalSigmaRef_tfm2 : 0;
 
-        const xInf = Xc + ds_inf * scale;
+        const xInf_draw = Xc + ds_inf * scale;
         const xSup1_draw = Xc + ds_sup1 * scale;
         const xSup2_draw = Xc + ds_sup2 * scale;
 
         let pointsList = [];
         pointsList.push(`${Xc},${yInf_px}`);
-        pointsList.push(`${xInf},${yInf_px}`);
+        pointsList.push(`${xInf_draw},${yInf_px}`);
 
-        if (hTotalComponent_m > ySup1_m + 1e-3 && Math.abs(ds_sup2 - ds_sup1) > 1e-6 * Math.abs(globalSigmaRef_tfm2)) { 
-            pointsList.push(`${xSup1_draw},${ySup1_px}`);
-            pointsList.push(`${xSup2_draw},${ySup2_px}`);
-        } else { 
-            pointsList.push(`${xSup1_draw},${ySup2_px}`); 
+        if (isCompositeDiagram) {
+            pointsList.push(`${xSup1_draw},${ySup1_interface_px}`);
+            if (sigma_interface_slab_tfm2 !== null && !isNaN(sigma_interface_slab_tfm2)) {
+                const xInterface_slab_draw = Xc + sigma_interface_slab_tfm2 * scale;
+                pointsList.push(`${xInterface_slab_draw},${ySup1_interface_px}`);
+            }
+            pointsList.push(`${xSup2_draw},${ySup_component_top_px}`);
+        } else {
+            pointsList.push(`${xSup1_draw},${ySup_component_top_px}`);
         }
-        pointsList.push(`${Xc},${ySup2_px}`);
+
+        pointsList.push(`${Xc},${ySup_component_top_px}`);
         const pts = pointsList.join(' ');
 
         const svg = document.createElementNS(SVG_NS, 'svg');
@@ -1163,24 +1163,22 @@
         const bg = document.createElementNS(SVG_NS, 'rect');
         bg.setAttribute('x', 0); bg.setAttribute('y', 0);
         bg.setAttribute('width', W); bg.setAttribute('height', H);
-        bg.setAttribute('fill', '#f9fafb');
+        bg.setAttribute('fill', 'none'); // Transparent background
         svg.appendChild(bg);
 
         const poly = document.createElementNS(SVG_NS, 'polygon');
         poly.setAttribute('points', pts);
 
         let colorType = 'mix';
-        const allStressesForColor = [ds_inf, ds_sup1];
-        if (hTotalComponent_m > ySup1_m + 1e-3) { // Considera ds_sup2 para cor apenas se for seção composta
-            allStressesForColor.push(ds_sup2);
-        }
+        const allStressesForColor = [ds_inf, ds_sup1, ds_sup2];
+        if(sigma_interface_slab_tfm2 !== null) allStressesForColor.push(sigma_interface_slab_tfm2);
+        
         const hasPositive = allStressesForColor.some(v => v > 1e-3);
         const hasNegative = allStressesForColor.some(v => v < -1e-3);
 
         if (hasPositive && !hasNegative) colorType = 'tens';
         else if (!hasPositive && hasNegative) colorType = 'comp';
         else if (!hasPositive && !hasNegative) colorType = 'null';
-
 
         if (colorType === 'comp') {
             poly.setAttribute('fill', 'rgba(252,165,165,0.35)'); poly.setAttribute('stroke', 'rgba(185,28,28,0.8)');
@@ -1195,23 +1193,12 @@
         svg.appendChild(poly);
 
         const axisLine = document.createElementNS(SVG_NS, "line");
-        axisLine.setAttribute("x1", Xc); axisLine.setAttribute("y1", ySup2_px);
-        axisLine.setAttribute("x2", Xc); axisLine.setAttribute("y2", yInf_px);
+        axisLine.setAttribute("x1", Xc); 
+        axisLine.setAttribute("y1", ySup_component_top_px);
+        axisLine.setAttribute("x2", Xc); 
+        axisLine.setAttribute("y2", yInf_px);
         axisLine.setAttribute("stroke", "#333"); axisLine.setAttribute("stroke-width", "0.5");
         svg.appendChild(axisLine);
-
-        const effectiveSupStressForLN = (hTotalComponent_m > ySup1_m + 1e-3) ? ds_sup2 : ds_sup1;
-        if ((ds_inf < -1e-3 && effectiveSupStressForLN > 1e-3) || (ds_inf > 1e-3 && effectiveSupStressForLN < -1e-3)) {
-            const yn = yInf_px - (Math.abs(ds_inf) / (Math.abs(ds_inf) + Math.abs(effectiveSupStressForLN))) * (yInf_px - ySup2_px);
-            if (isFinite(yn)) { // Adiciona linha neutra apenas se yn for um número finito
-                const ln = document.createElementNS(SVG_NS, 'line');
-                ln.setAttribute('x1', Xc - (W/2 - pad.left) * 0.8); ln.setAttribute('x2', Xc + (W/2 - pad.right) * 0.8);
-                ln.setAttribute('y1', yn); ln.setAttribute('y2', yn);
-                ln.setAttribute('stroke', '#555'); ln.setAttribute('stroke-dasharray', '2,1');
-                ln.setAttribute('stroke-width', '0.5');
-                svg.appendChild(ln);
-            }
-        }
         
         const titleTextElement = document.createElementNS(SVG_NS, 'text');
         titleTextElement.setAttribute('x', Xc);
@@ -1222,131 +1209,136 @@
         titleTextElement.innerHTML = title; 
         svg.appendChild(titleTextElement);
 
-        const stressesToLabelConfig = [
-            { rawVal: s_inf, displayVal: ds_inf, y: yInf_px, x_offset_val_for_pos: ds_inf },
-            { rawVal: s_sup1, displayVal: ds_sup1, y: ySup1_px, x_offset_val_for_pos: ds_sup1 }
-        ];
-        if (hTotalComponent_m > ySup1_m + 1e-3) { 
-            stressesToLabelConfig.push({ rawVal: s_sup2_raw, displayVal: ds_sup2, y: ySup2_px, x_offset_val_for_pos: ds_sup2 });
-        }
-
-        stressesToLabelConfig.forEach(item => {
-            if (item.rawVal === null || isNaN(item.rawVal) || Math.abs(item.displayVal) < 1e-3 ) {
-                 // Exceção: se o valor original for 0 (não null/NaN), mostre "0"
-                if (!(item.rawVal === 0 && !isNaN(item.rawVal))) return;
+        // Lógica para adicionar os rótulos de tensão
+        const addLabel = (value, y_px, vertical_offset = 0) => {
+            if (value === null || isNaN(value) || (Math.abs(value) < 1e-3 && value !== 0)) {
+                return;
             }
-
             const tx = document.createElementNS(SVG_NS, 'text');
-            const xText = Xc + item.x_offset_val_for_pos * scale + (item.displayVal >= 0 ? 3 : -3);
-            
-            tx.setAttribute('x', Math.min(W - pad.right -1, Math.max(pad.left + 1, xText))); 
-            tx.setAttribute('y', item.y + (item.y === yInf_px ? -3 : (item.y === ySup2_px ? 10 : (item.y === ySup1_px && ySup1_px < yInf_px - 5 ? 3 : -3) ) ) ); 
-            tx.setAttribute('text-anchor', item.displayVal >= 0 ? 'start' : 'end');
+            const xText = Xc + value * scale + (value >= 0 ? 3 : -3);
+            tx.setAttribute('x', xText);
+            tx.setAttribute('y', y_px + vertical_offset);
+            tx.setAttribute('text-anchor', value >= 0 ? 'start' : 'end');
+            tx.setAttribute('dominant-baseline', 'middle');
             tx.style.fontSize = '9px';
             tx.style.fontFamily = 'monospace';
-            tx.textContent = formatNumber(item.displayVal, Math.abs(item.displayVal) < 1 && item.displayVal !== 0 ? 1 : 0, false, true);
+            tx.textContent = formatNumber(value, Math.abs(value) < 1 && value !== 0 ? 1 : 0, false, true);
             svg.appendChild(tx);
-        });
+        };
+
+        addLabel(ds_inf, yInf_px, -4);
+
+        if (isCompositeDiagram) {
+            addLabel(ds_sup1, ySup1_interface_px, -4);
+            if (sigma_interface_slab_tfm2 !== null) {
+                addLabel(sigma_interface_slab_tfm2, ySup1_interface_px, 4);
+            }
+            addLabel(ds_sup2, ySup_component_top_px, 4);
+        } else {
+            addLabel(ds_sup1, ySup_component_top_px, 4);
+        }
+
         return svg;
     }
     
 
     // --- Função para gerar e exibir diagramas de superposição ---
     function getCombinationDefinitions(inputs, eta) {
+        // [CORRIGIDO] Revertido para a estrutura granular para garantir a precisão dos cálculos.
         return [
             { // 0: η ⋅ 1.1 ⋅ P1o + G1
                 components: [
-                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'η⋅1.1⋅N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: eta * 1.1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'η⋅1.1⋅M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: eta * 1.1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'η⋅1.1⋅N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: eta * 1.1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'η⋅1.1⋅M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: eta * 1.1, diagramSectionHeightKey: 'inicial.h_total' },
                 ],
-                resultDiagramSectionHeightKey: 'inicial.h_total', resultStressFiberSupKey: 'sup1'
+                resultDiagramSectionHeightKey: 'inicial.h_total'
             },
             { // 1: 1.1 ⋅ (P1o + P2o) + G1
                 components: [
-                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: '1.1⋅N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1.1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: '1.1⋅M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1.1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: '1.1⋅N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1.1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: '1.1⋅M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1.1, diagramSectionHeightKey: 'inicial.h_total' },
                     ...(inputs.num_cables2 > 0 ? [
-                        { title: '1.1⋅N<sub>P2o</sub>', stressKeyAx: 'p2o_ax', stressKeyFlex: null, multiplier: 1.1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                        { title: '1.1⋅M<sub>P2o</sub>', stressKeyAx: null, stressKeyFlex: 'p2o_flex', multiplier: 1.1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' }
+                        { title: '1.1⋅N<sub>P2o</sub>', stressKeyAx: 'p2o_ax', stressKeyFlex: null, multiplier: 1.1, diagramSectionHeightKey: 'inicial.h_total' },
+                        { title: '1.1⋅M<sub>P2o</sub>', stressKeyAx: null, stressKeyFlex: 'p2o_flex', multiplier: 1.1, diagramSectionHeightKey: 'inicial.h_total' }
                     ] : []),
                 ],
-                resultDiagramSectionHeightKey: 'inicial.h_total', resultStressFiberSupKey: 'sup1'
+                resultDiagramSectionHeightKey: 'inicial.h_total'
             },
             { // 2: P1o + G1 + G2
                 components: [
-                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'N<sub>g2</sub>', stressKeyAx: 'ng2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>g2</sub>', stressKeyAx: null, stressKeyFlex: 'mg2_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'N<sub>g2</sub>', stressKeyAx: 'ng2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>g2</sub>', stressKeyAx: null, stressKeyFlex: 'mg2_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
                 ],
-                resultDiagramSectionHeightKey: 'inicial.h_total', resultStressFiberSupKey: 'sup1'
+                resultDiagramSectionHeightKey: 'inicial.h_total'
             },
-            { // 3: G1+G2 + P1o+P2o --- RESULTADO NA SEÇÃO INICIAL ATÉ SUP1
+            { // 3: G1+G2 + P1o+P2o
                 components: [
-                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'N<sub>g2</sub>', stressKeyAx: 'ng2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>g2</sub>', stressKeyAx: null, stressKeyFlex: 'mg2_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
+                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'N<sub>g2</sub>', stressKeyAx: 'ng2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>g2</sub>', stressKeyAx: null, stressKeyFlex: 'mg2_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
                     ...(inputs.num_cables2 > 0 ? [
-                        { title: 'N<sub>P2o</sub>', stressKeyAx: 'p2o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                        { title: 'M<sub>P2o</sub>', stressKeyAx: null, stressKeyFlex: 'p2o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' }
+                        { title: 'N<sub>P2o</sub>', stressKeyAx: 'p2o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                        { title: 'M<sub>P2o</sub>', stressKeyAx: null, stressKeyFlex: 'p2o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' }
                     ] : []),
                 ],
-                resultDiagramSectionHeightKey: 'inicial.h_total', resultStressFiberSupKey: 'sup1' 
+                resultDiagramSectionHeightKey: 'inicial.h_total'
             },
             { // 4: ELS-F: P1o+ΔP1 + P2o+ΔP2 + G1+G2+G3 + ψ1⋅Q
                 components: [
-                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'N<sub>g2</sub>', stressKeyAx: 'ng2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>g2</sub>', stressKeyAx: null, stressKeyFlex: 'mg2_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'N<sub>g3</sub>', stressKeyAx: 'ng3_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
-                    { title: 'M<sub>g3</sub>', stressKeyAx: null, stressKeyFlex: 'mg3_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
-                    { title: 'N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'N<sub>&Delta;P1</sub>', stressKeyAx: 'delta_p1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
-                    { title: 'M<sub>&Delta;P1</sub>', stressKeyAx: null, stressKeyFlex: 'delta_p1_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'N<sub>g2</sub>', stressKeyAx: 'ng2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>g2</sub>', stressKeyAx: null, stressKeyFlex: 'mg2_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'N<sub>g3</sub>', stressKeyAx: 'ng3_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total' },
+                    { title: 'M<sub>g3</sub>', stressKeyAx: null, stressKeyFlex: 'mg3_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total' },
+                    { title: 'N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'N<sub>&Delta;P1</sub>', stressKeyAx: 'delta_p1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total' },
+                    { title: 'M<sub>&Delta;P1</sub>', stressKeyAx: null, stressKeyFlex: 'delta_p1_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total' },
                     ...(inputs.num_cables2 > 0 ? [
-                        { title: 'N<sub>P2o</sub>', stressKeyAx: 'p2o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                        { title: 'M<sub>P2o</sub>', stressKeyAx: null, stressKeyFlex: 'p2o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                        { title: 'N<sub>&Delta;P2</sub>', stressKeyAx: 'delta_p2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
-                        { title: 'M<sub>&Delta;P2</sub>', stressKeyAx: null, stressKeyFlex: 'delta_p2_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' }
+                        { title: 'N<sub>P2o</sub>', stressKeyAx: 'p2o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                        { title: 'M<sub>P2o</sub>', stressKeyAx: null, stressKeyFlex: 'p2o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                        { title: 'N<sub>&Delta;P2</sub>', stressKeyAx: 'delta_p2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total' },
+                        { title: 'M<sub>&Delta;P2</sub>', stressKeyAx: null, stressKeyFlex: 'delta_p2_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total' }
                     ] : []),
-                    { title: 'N<sub>&psi;1Q</sub>', stressKeyAx: 'nq_ax', stressKeyFlex: null, multiplier: inputs.psi1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
-                    { title: 'M<sub>&psi;1Q</sub>', stressKeyAx: null, stressKeyFlex: 'mq_flex', multiplier: inputs.psi1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    { title: 'N<sub>&psi;1Q</sub>', stressKeyAx: 'nq_ax', stressKeyFlex: null, multiplier: inputs.psi1, diagramSectionHeightKey: 'final.h_total' },
+                    { title: 'M<sub>&psi;1Q</sub>', stressKeyAx: null, stressKeyFlex: 'mq_flex', multiplier: inputs.psi1, diagramSectionHeightKey: 'final.h_total' },
                 ],
-                resultDiagramSectionHeightKey: 'final.h_total', resultStressFiberSupKey: 'sup2'
+                resultDiagramSectionHeightKey: 'final.h_total'
             },
             { // 5: ELS-D: P1o+ΔP1 + P2o+ΔP2 + G1+G2+G3 + ψ2⋅Q
                  components: [
-                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'N<sub>g2</sub>', stressKeyAx: 'ng2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>g2</sub>', stressKeyAx: null, stressKeyFlex: 'mg2_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'N<sub>g3</sub>', stressKeyAx: 'ng3_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
-                    { title: 'M<sub>g3</sub>', stressKeyAx: null, stressKeyFlex: 'mg3_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
-                    { title: 'N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                    { title: 'N<sub>&Delta;P1</sub>', stressKeyAx: 'delta_p1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
-                    { title: 'M<sub>&Delta;P1</sub>', stressKeyAx: null, stressKeyFlex: 'delta_p1_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    { title: 'N<sub>g1</sub>', stressKeyAx: 'ng1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>g1</sub>', stressKeyAx: null, stressKeyFlex: 'mg1_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'N<sub>g2</sub>', stressKeyAx: 'ng2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>g2</sub>', stressKeyAx: null, stressKeyFlex: 'mg2_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'N<sub>g3</sub>', stressKeyAx: 'ng3_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total' },
+                    { title: 'M<sub>g3</sub>', stressKeyAx: null, stressKeyFlex: 'mg3_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total' },
+                    { title: 'N<sub>P1o</sub>', stressKeyAx: 'p1o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'M<sub>P1o</sub>', stressKeyAx: null, stressKeyFlex: 'p1o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                    { title: 'N<sub>&Delta;P1</sub>', stressKeyAx: 'delta_p1_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total' },
+                    { title: 'M<sub>&Delta;P1</sub>', stressKeyAx: null, stressKeyFlex: 'delta_p1_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total' },
                     ...(inputs.num_cables2 > 0 ? [
-                        { title: 'N<sub>P2o</sub>', stressKeyAx: 'p2o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                        { title: 'M<sub>P2o</sub>', stressKeyAx: null, stressKeyFlex: 'p2o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total', diagramFiberSupKey: 'sup1' },
-                        { title: 'N<sub>&Delta;P2</sub>', stressKeyAx: 'delta_p2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
-                        { title: 'M<sub>&Delta;P2</sub>', stressKeyAx: null, stressKeyFlex: 'delta_p2_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' }
+                        { title: 'N<sub>P2o</sub>', stressKeyAx: 'p2o_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                        { title: 'M<sub>P2o</sub>', stressKeyAx: null, stressKeyFlex: 'p2o_flex', multiplier: 1, diagramSectionHeightKey: 'inicial.h_total' },
+                        { title: 'N<sub>&Delta;P2</sub>', stressKeyAx: 'delta_p2_ax', stressKeyFlex: null, multiplier: 1, diagramSectionHeightKey: 'final.h_total' },
+                        { title: 'M<sub>&Delta;P2</sub>', stressKeyAx: null, stressKeyFlex: 'delta_p2_flex', multiplier: 1, diagramSectionHeightKey: 'final.h_total' }
                     ] : []),
-                    { title: 'N<sub>&psi;2Q</sub>', stressKeyAx: 'nq_ax', stressKeyFlex: null, multiplier: inputs.psi2, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
-                    { title: 'M<sub>&psi;2Q</sub>', stressKeyAx: null, stressKeyFlex: 'mq_flex', multiplier: inputs.psi2, diagramSectionHeightKey: 'final.h_total', diagramFiberSupKey: 'sup2' },
+                    { title: 'N<sub>&psi;2Q</sub>', stressKeyAx: 'nq_ax', stressKeyFlex: null, multiplier: inputs.psi2, diagramSectionHeightKey: 'final.h_total' },
+                    { title: 'M<sub>&psi;2Q</sub>', stressKeyAx: null, stressKeyFlex: 'mq_flex', multiplier: inputs.psi2, diagramSectionHeightKey: 'final.h_total' },
                 ],
-                resultDiagramSectionHeightKey: 'final.h_total', resultStressFiberSupKey: 'sup2'
+                resultDiagramSectionHeightKey: 'final.h_total'
             }
         ];
     }
@@ -1381,40 +1373,17 @@
             container.innerHTML = '<p class="text-sm text-red-500 italic">Erro: Formato inesperado para os dados da combinação calculada.</p>';
             return;
         }
-
-        let totalSigmaInf_tfm2_final = currentComboResult_tfm2.inf;
-        let totalSigmaSup_tfm2_final_for_diagram; 
-        let sectionHeightForResultDiagram_m;
-        let ySup1_forResultDiagram_m = properties.inicial.h_total; 
-
-        if (combinationIndex <= 2 || combinationIndex === 3) { 
-            totalSigmaSup_tfm2_final_for_diagram = currentComboResult_tfm2.actualSup1ForTable; 
-            sectionHeightForResultDiagram_m = properties.inicial.h_total;
-        } else { 
-            totalSigmaSup_tfm2_final_for_diagram = currentComboResult_tfm2.actualSup2ForTable;
-            sectionHeightForResultDiagram_m = properties.final.h_total;
-        }
-
+        
+        const hMax_m = properties.final.h_total > 1e-3 ? properties.final.h_total : properties.inicial.h_total;
 
         let allStressValuesForSigmaRef_tfm2 = [];
         selectedCombinationDef.components.forEach(comp => {
             const stressDataAx = comp.stressKeyAx ? indStressesToUse[comp.stressKeyAx] : null; 
             const stressDataFlex = comp.stressKeyFlex ? indStressesToUse[comp.stressKeyFlex] : null;
             
-            let s_inf_knm2_comp = 0;
-            let s_sup1_knm2_comp = 0; 
-            let s_sup2_knm2_comp = 0;
-
-            if (stressDataAx) {
-                s_inf_knm2_comp += safeGet(stressDataAx, 'inf') * comp.multiplier;
-                s_sup1_knm2_comp += safeGet(stressDataAx, 'sup1') * comp.multiplier;
-                s_sup2_knm2_comp += safeGet(stressDataAx, 'sup2') * comp.multiplier;
-            }
-            if (stressDataFlex) {
-                s_inf_knm2_comp += safeGet(stressDataFlex, 'inf') * comp.multiplier;
-                s_sup1_knm2_comp += safeGet(stressDataFlex, 'sup1') * comp.multiplier;
-                s_sup2_knm2_comp += safeGet(stressDataFlex, 'sup2') * comp.multiplier;
-            }
+            let s_inf_knm2_comp = (safeGet(stressDataAx, 'inf') + safeGet(stressDataFlex, 'inf')) * comp.multiplier;
+            let s_sup1_knm2_comp = (safeGet(stressDataAx, 'sup1') + safeGet(stressDataFlex, 'sup1')) * comp.multiplier;
+            let s_sup2_knm2_comp = (safeGet(stressDataAx, 'sup2') + safeGet(stressDataFlex, 'sup2')) * comp.multiplier;
             
             if (!isNaN(s_inf_knm2_comp)) allStressValuesForSigmaRef_tfm2.push(Math.abs(s_inf_knm2_comp * KN_M2_TO_TF_M2));
             if (!isNaN(s_sup1_knm2_comp)) allStressValuesForSigmaRef_tfm2.push(Math.abs(s_sup1_knm2_comp * KN_M2_TO_TF_M2));
@@ -1423,11 +1392,11 @@
             }
         });
 
-        if (totalSigmaInf_tfm2_final !== null && !isNaN(totalSigmaInf_tfm2_final)) allStressValuesForSigmaRef_tfm2.push(Math.abs(totalSigmaInf_tfm2_final));
-        if (currentComboResult_tfm2.actualSup1ForTable !== null && !isNaN(currentComboResult_tfm2.actualSup1ForTable)) { // Considera sup1 do resultado
+        if (currentComboResult_tfm2.inf !== null && !isNaN(currentComboResult_tfm2.inf)) allStressValuesForSigmaRef_tfm2.push(Math.abs(currentComboResult_tfm2.inf));
+        if (currentComboResult_tfm2.actualSup1ForTable !== null && !isNaN(currentComboResult_tfm2.actualSup1ForTable)) {
             allStressValuesForSigmaRef_tfm2.push(Math.abs(currentComboResult_tfm2.actualSup1ForTable));
         }
-        if (currentComboResult_tfm2.actualSup2ForTable !== null && !isNaN(currentComboResult_tfm2.actualSup2ForTable)) { // Considera sup2 do resultado
+        if (currentComboResult_tfm2.actualSup2ForTable !== null && !isNaN(currentComboResult_tfm2.actualSup2ForTable)) {
             allStressValuesForSigmaRef_tfm2.push(Math.abs(currentComboResult_tfm2.actualSup2ForTable));
         }
         
@@ -1442,20 +1411,9 @@
             const stressDataAx = comp.stressKeyAx ? indStressesToUse[comp.stressKeyAx] : null;
             const stressDataFlex = comp.stressKeyFlex ? indStressesToUse[comp.stressKeyFlex] : null;
             
-            let s_inf_knm2_comp = 0;
-            let s_sup1_knm2_comp = 0; 
-            let s_sup2_knm2_comp = 0; 
-
-            if (stressDataAx) {
-                s_inf_knm2_comp += safeGet(stressDataAx, 'inf') * comp.multiplier;
-                s_sup1_knm2_comp += safeGet(stressDataAx, 'sup1') * comp.multiplier; 
-                s_sup2_knm2_comp += safeGet(stressDataAx, 'sup2') * comp.multiplier; 
-            }
-            if (stressDataFlex) {
-                s_inf_knm2_comp += safeGet(stressDataFlex, 'inf') * comp.multiplier;
-                s_sup1_knm2_comp += safeGet(stressDataFlex, 'sup1') * comp.multiplier;
-                s_sup2_knm2_comp += safeGet(stressDataFlex, 'sup2') * comp.multiplier;
-            }
+            let s_inf_knm2_comp = (safeGet(stressDataAx, 'inf') + safeGet(stressDataFlex, 'inf')) * comp.multiplier;
+            let s_sup1_knm2_comp = (safeGet(stressDataAx, 'sup1') + safeGet(stressDataFlex, 'sup1')) * comp.multiplier;
+            let s_sup2_knm2_comp = (safeGet(stressDataAx, 'sup2') + safeGet(stressDataFlex, 'sup2')) * comp.multiplier;
             
             let currentComponentSectionHeight_m = getPropertyByPath(properties, comp.diagramSectionHeightKey);
             
@@ -1469,6 +1427,7 @@
                 sigmas_tfm2,
                 properties.inicial.h_total, 
                 currentComponentSectionHeight_m, 
+                hMax_m,
                 comp.title,
                 effectiveSigmaRef_tfm2
             );
@@ -1487,19 +1446,33 @@
         equalsSign.textContent = '=';
         container.appendChild(equalsSign);
 
-        // Para o diagrama resultante final
         const result_s_inf_tfm2 = currentComboResult_tfm2.inf;
         const result_s_sup1_tfm2 = currentComboResult_tfm2.actualSup1ForTable;
         let result_s_sup2_tfm2 = currentComboResult_tfm2.actualSup2ForTable;
+        const resultSectionHeight_m = getPropertyByPath(properties, selectedCombinationDef.resultDiagramSectionHeightKey);
+
+        let sigma_interface_slab_tfm2 = null;
+        if (combinationIndex >= 4) {
+            let sigma_interface_slab_knm2 = 0;
+            const componentsForInterface = selectedCombinationDef.components.filter(c => c.diagramSectionHeightKey === 'final.h_total');
+            componentsForInterface.forEach(comp => {
+                const stressAx = comp.stressKeyAx ? safeGet(indStressesToUse[comp.stressKeyAx], 'sup1') : 0;
+                const stressFlex = comp.stressKeyFlex ? safeGet(indStressesToUse[comp.stressKeyFlex], 'sup1') : 0;
+                sigma_interface_slab_knm2 += (stressAx + stressFlex) * comp.multiplier;
+            });
+            sigma_interface_slab_tfm2 = sigma_interface_slab_knm2 * KN_M2_TO_TF_M2;
+        }
 
         const finalSigmas_tfm2 = [result_s_inf_tfm2, result_s_sup1_tfm2, result_s_sup2_tfm2];
 
         const finalSvg = drawStressDiagramEnhanced(
             finalSigmas_tfm2, 
-            ySup1_forResultDiagram_m, 
-            sectionHeightForResultDiagram_m, 
+            properties.inicial.h_total, 
+            resultSectionHeight_m, 
+            hMax_m,
             'Resultado',
-            effectiveSigmaRef_tfm2
+            effectiveSigmaRef_tfm2,
+            sigma_interface_slab_tfm2
         );
         container.appendChild(finalSvg);
     }
@@ -1535,7 +1508,7 @@
             
             const combinedStresses_tfm2 = calculateCombinedStressesAndVerifications(inputs, limitStresses_tfm2, localIndStresses_knm2, properties); 
 
-            populateUIWithResults(properties, limitStresses_tfm2, combinedStresses_tfm2, localIndStresses_knm2, prestressMoments_tfm, prestressForces_tf, decompressionMoments_tfm, inputs); // Passa inputs
+            populateUIWithResults(properties, limitStresses_tfm2, combinedStresses_tfm2, localIndStresses_knm2, prestressMoments_tfm, prestressForces_tf, decompressionMoments_tfm, inputs);
             
             drawSection(); 
             resultsSection.classList.remove('hidden');
@@ -1597,7 +1570,6 @@
         getElement('tab-btn-materiais').addEventListener('click', () => changeTab('materiais'));
         getElement('tab-btn-acoes').addEventListener('click', () => changeTab('acoes'));
         
-        // Removido onclick="" do HTML, mantendo apenas addEventListener
         prevBtn.addEventListener('click', () => changeStep(-1));
         nextBtn.addEventListener('click', () => changeStep(1));
 
