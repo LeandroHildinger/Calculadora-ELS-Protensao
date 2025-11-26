@@ -19,6 +19,7 @@ namespace LINK
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            new AboutBox1().ShowDialog();
             Application.Run(new Form1());
         }
 

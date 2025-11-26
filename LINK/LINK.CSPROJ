@@ -83,27 +83,27 @@
   <ItemGroup>
     <Reference Include="ACESSON, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\..\TQSAPP\LINK\EXEC\ACESSON.DLL</HintPath>
+      <HintPath>..\EXEC\ACESSON.DLL</HintPath>
     </Reference>
     <Reference Include="DataLink, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\..\TQSAPP\LINK\EXEC\DataLink.dll</HintPath>
+      <HintPath>..\EXEC\DataLink.dll</HintPath>
     </Reference>
     <Reference Include="NDrawing2D, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\..\TQSAPP\LINK\EXEC\NDrawing2D.dll</HintPath>
+      <HintPath>..\EXEC\NDrawing2D.dll</HintPath>
     </Reference>
     <Reference Include="NDrawing2DCreation, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\..\TQSAPP\LINK\EXEC\NDrawing2DCreation.dll</HintPath>
+      <HintPath>..\EXEC\NDrawing2DCreation.dll</HintPath>
     </Reference>
     <Reference Include="NDrawing2DDWG, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\..\TQSAPP\LINK\EXEC\NDrawing2DDWG.dll</HintPath>
+      <HintPath>..\EXEC\NDrawing2DDWG.dll</HintPath>
     </Reference>
     <Reference Include="NGeometry2D, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\..\TQSAPP\LINK\EXEC\NGeometry2D.dll</HintPath>
+      <HintPath>..\EXEC\NGeometry2D.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
