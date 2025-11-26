@@ -1,0 +1,2 @@
+Attribute VB_Name = "CUSTOMDL_HASH"
+Public Const CUSTOMDL_HASH As String = "e2361034eb8b06135cb5330a06dbb29558f3b681"
