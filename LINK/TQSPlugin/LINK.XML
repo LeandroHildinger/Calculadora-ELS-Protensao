@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<TQS_APP xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <CMenuApp>
+    <m_iversion>0</m_iversion>
+    <m_numpanels>1</m_numpanels>
+    <m_panels>
+      <CMenuAppPanel>
+        <m_iversion>0</m_iversion>
+        <m_name>TQS Store</m_name>
+        <m_numbuttons>1</m_numbuttons>
+        <m_buttons>
+          <CMenuAppButton>
+            <m_iversion>0</m_iversion>
+            <m_aplicnp>LINK.EXE</m_aplicnp>
+            <m_buttonname>LINK</m_buttonname>
+            <m_largeicon>LINK_32X32.ICO</m_largeicon>
+            <m_smallicon>LINK_16X16.ICO</m_smallicon>
+            <m_tooltip></m_tooltip>
+            <m_description></m_description>
+          </CMenuAppButton>
+        </m_buttons>
+      </CMenuAppPanel>
+    </m_panels>
+  </CMenuApp>
+</TQS_APP>
